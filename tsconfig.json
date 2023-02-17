@@ -1,4 +1,13 @@
 {
   // https://nuxt.com/docs/guide/concepts/typescript
-  "extends": "./.nuxt/tsconfig.json"
+  "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    "suppressImplicitAnyIndexErrors": true
+  },
+  "include": [
+    "env.d.ts",
+    "**/*.ts",
+    "**/*.vue",
+    ".nuxt/nuxt.d.ts"
+  ]
 }
