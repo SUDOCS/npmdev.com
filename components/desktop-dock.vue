@@ -69,13 +69,11 @@ import { dockCenterApps, dockLeftApps, dockRightApps } from '@/applets'
 .tooltip{
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
-  @apply absolute left-50% mx-auto top--40px py-4px px-12px rounded-12px;
-  @apply bg-#eee text-black text-12px text-center whitespace-nowrap;
+  @apply absolute left-50% mx-auto top--40px py-4px px-12px rounded-12px bg-#eee text-black text-12px text-center whitespace-nowrap;
   transform: translateX(-50%);
 
-  &::before{
-    @apply absolute top-100% left-50% w-0 h-0 content-none;
-    @apply border-6px border-#eee border-solid border-b-transparent border-l-transparent border-r-transparent;
+  &:before{
+    @apply absolute top-100% left-50% w-0 h-0 content-none border-6px border-#eee border-solid border-b-transparent border-l-transparent border-r-transparent;
     transform: translateX(-50%);
   }
 }
