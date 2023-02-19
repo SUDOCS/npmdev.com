@@ -27,16 +27,16 @@ onUnmounted(() => {
         min-w="72px" max-w="1/4" h-full rounded-12px absolute left-6px top-0
         hidden md:flex flex="row gap-16px" justify-end items-center
       >
-        <div v-for="app in dockLeftApps" :key="app.name" class="app-entry">
+        <div v-for="app in dockLeftApps" :key="app.name" class="dock-app-entry">
           <img :src="app.icon" :alt="app.title" w-full h-full object-fill>
-          <span class="tooltip">{{ app.title }}</span>
+          <span class="dock-tooltip">{{ app.title }}</span>
         </div>
       </div>
       <!-- 中间 -->
       <div max-w-full lg:max-w="1/2" mx-auto h-full rounded-12px flex="~ row gap-16px" justify-center items-center>
-        <div v-for="app in dockCenterApps" :key="app.name" class="app-entry">
+        <div v-for="app in dockCenterApps" :key="app.name" class="dock-app-entry">
           <img :src="app.icon" :alt="app.title" w-full h-full object-fill>
-          <span class="tooltip">{{ app.title }}</span>
+          <span class="dock-tooltip">{{ app.title }}</span>
         </div>
       </div>
       <!-- 右边 -->
@@ -55,16 +55,16 @@ onUnmounted(() => {
           </a>
         </div>
 
-        <div v-for="app in dockRightApps" :key="app.name" class="app-entry">
+        <div v-for="app in dockRightApps" :key="app.name" class="dock-app-entry">
           <img :src="app.icon" :alt="app.title" w-full h-full object-fill>
-          <span class="tooltip">{{ app.title }}</span>
+          <span class="dock-tooltip">{{ app.title }}</span>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @keyframes dockin {
   0% {
     bottom: -80px;
@@ -75,20 +75,20 @@ onUnmounted(() => {
   }
 }
 
-.app-entry{
+.dock-app-entry{
   @apply h-48px w-48px relative;
   transition: filter 0.2s ease-in-out;
 
   &:hover{
     filter: contrast(2);
 
-    .tooltip{
+    .dock-tooltip{
       opacity: 1;
     }
   }
 }
 
-.tooltip{
+.dock-tooltip{
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
   @apply absolute left-50% mx-auto top--40px py-4px px-12px rounded-12px bg-#eee text-black text-12px text-center whitespace-nowrap;
