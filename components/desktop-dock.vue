@@ -1,5 +1,19 @@
 <script setup lang="ts">
 import { dockCenterApps, dockLeftApps, dockRightApps } from '@/applets'
+
+let timer: NodeJS.Timer | null = null
+
+const date = ref(new Date())
+
+onMounted(() => {
+  timer = setInterval(() => {
+    date.value = new Date()
+  }, 1000)
+})
+
+onUnmounted(() => {
+  clearInterval(timer as NodeJS.Timer)
+})
 </script>
 
 <template>
@@ -24,19 +38,21 @@ import { dockCenterApps, dockLeftApps, dockRightApps } from '@/applets'
       </div>
       <!-- 右边 -->
       <div min-w="72px" max-w="1/4" h-full rounded-12px absolute right-6px top-0 flex="~ row gap-16px" justify-end items-center>
+        <!-- 时间和备案号 -->
+        <div flex="~ col" justify-evenly items-center text-13px h-48px>
+          <span>
+            {{ date.toLocaleDateString() }} {{ date.toLocaleTimeString() }}
+          </span>
+
+          <a href="https://beian.miit.gov.cn" target="_blank">
+            赣ICP备20000000号-1
+          </a>
+        </div>
+
         <div v-for="app in dockRightApps" :key="app.name" class="app-entry">
           <img :src="app.icon" :alt="app.title" w-full h-full object-fill>
           <span class="tooltip">{{ app.title }}</span>
         </div>
-      </div>
-      <!-- 备案号 -->
-      <div
-        absolute top--132px lh-24px w-160px left-0 right-0 mx-auto
-        bg="[#c2e9fb66]" backdrop-blur-4px rounded-12px text-white text-12px select-none text-center
-        cursor-pointer transition-colors shadow-2xl
-        class="beian"
-      >
-        赣ICP备20000000号-1
       </div>
     </div>
   </div>
@@ -75,12 +91,6 @@ import { dockCenterApps, dockLeftApps, dockRightApps } from '@/applets'
   &:before{
     @apply absolute top-100% left-50% w-0 h-0 content-none border-6px border-#eee border-solid border-b-transparent border-l-transparent border-r-transparent;
     transform: translateX(-50%);
-  }
-}
-
-.beian{
-  &:hover{
-    filter: contrast(2);
   }
 }
 </style>
