@@ -7,6 +7,7 @@ specifiers:
   '@nuxt/devtools': ^0.1.4
   '@types/node': ^18.13.0
   '@unocss/nuxt': ^0.49.6
+  '@unocss/preset-web-fonts': ^0.49.7
   '@unocss/transformer-directives': ^0.49.6
   eslint: ^8.34.0
   husky: ^8.0.3
@@ -22,6 +23,7 @@ devDependencies:
   '@nuxt/devtools': 0.1.4_nuxt@3.2.0
   '@types/node': 18.13.0
   '@unocss/nuxt': 0.49.6
+  '@unocss/preset-web-fonts': 0.49.7
   '@unocss/transformer-directives': 0.49.6
   eslint: 8.34.0
   husky: 8.0.3
@@ -1973,6 +1975,10 @@ packages:
     resolution: {integrity: sha512-XVk8E4A8XH85uteouQkeRD+SUuZ1/qOqEGAsJ0RUBzLp9Yvb+xWHwVVvMs7XJKeo49PpyrZCk9mHJ6hjr748Gg==}
     dev: true
 
+  /@unocss/core/0.49.7:
+    resolution: {integrity: sha512-RmSxSqpwrj2Qx4HQTg/xDZsimOfOWqGriUG1w0kFDhNmEoLuxZiDPEZhZYHIo2QaVzxxBdIiSKkMfvFOTqbUgA==}
+    dev: true
+
   /@unocss/inspector/0.49.6:
     resolution: {integrity: sha512-cyBJ4ym/Ge/JaBE6M/lk8ZrHfNz+U9N2FQ6DFRBFBDcXX1//Rt0QKhiaTcWKfkWD+gAcz+qo5gGNJdKKiXQDPQ==}
     dependencies:
@@ -2050,6 +2056,13 @@ packages:
     resolution: {integrity: sha512-r+4t9ztY7WVrqX9P5G6S7LkfzBJzz2ZXwY9z9KkBiWUvcQ9e9QnYvz42g0JR6IQ7xZ/0hbm/WL83uDrxjLknAQ==}
     dependencies:
       '@unocss/core': 0.49.6
+      ofetch: 1.0.1
+    dev: true
+
+  /@unocss/preset-web-fonts/0.49.7:
+    resolution: {integrity: sha512-GMeBjXQ1uBIIv5g4zbH7/0Nu+iJL7Q615Ygd+c3RY2CgIFwfY49zRuPiZBPehuCjdBpdGn5wGzmBupDAI2WQlg==}
+    dependencies:
+      '@unocss/core': 0.49.7
       ofetch: 1.0.1
     dev: true
 

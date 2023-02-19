@@ -39,12 +39,12 @@ onUnmounted(() => {
       <!-- 右边 -->
       <div min-w="72px" max-w="1/4" h-full rounded-12px absolute right-6px top-0 flex="~ row gap-16px" justify-end items-center>
         <!-- 时间和备案号 -->
-        <div flex="~ col" justify-evenly items-center text-13px h-48px>
-          <span>
+        <div flex="~ col" justify-evenly items-center h-48px>
+          <span text-15px>
             {{ date.toLocaleDateString() }} {{ date.toLocaleTimeString() }}
           </span>
 
-          <a href="https://beian.miit.gov.cn" target="_blank">
+          <a text-13px href="https://beian.miit.gov.cn" target="_blank">
             赣ICP备20000000号-1
           </a>
         </div>
