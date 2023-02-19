@@ -19,27 +19,33 @@ onUnmounted(() => {
 <template>
   <div h-80px p-xs fixed bottom-0 left-0 right-0 relative class="animate-[dockin_500ms_ease-out_forwards]">
     <div
-      w-full h-full rounded-12px text-center relative
+      w-full h-full rounded-12px text-center relative px-12px
       un-before="content-none absolute top-0 bottom-0 left-0 right-0 backdrop-blur-4px bg-[#c2e9fb66] m--4px rounded-12px"
     >
       <!-- 左边 -->
-      <div min-w="72px" max-w="1/4" h-full rounded-12px absolute left-6px top-0 flex="~ row gap-16px" justify-start items-center>
+      <div
+        min-w="72px" max-w="1/4" h-full rounded-12px absolute left-6px top-0
+        hidden md:flex flex="row gap-16px" justify-end items-center
+      >
         <div v-for="app in dockLeftApps" :key="app.name" class="app-entry">
           <img :src="app.icon" :alt="app.title" w-full h-full object-fill>
           <span class="tooltip">{{ app.title }}</span>
         </div>
       </div>
       <!-- 中间 -->
-      <div max-w="3/4" lg:max-w="1/2" mx-auto h-full rounded-12px flex="~ row gap-16px" justify-center items-center>
+      <div max-w-full lg:max-w="1/2" mx-auto h-full rounded-12px flex="~ row gap-16px" justify-center items-center>
         <div v-for="app in dockCenterApps" :key="app.name" class="app-entry">
           <img :src="app.icon" :alt="app.title" w-full h-full object-fill>
           <span class="tooltip">{{ app.title }}</span>
         </div>
       </div>
       <!-- 右边 -->
-      <div min-w="72px" max-w="1/4" h-full rounded-12px absolute right-6px top-0 flex="~ row gap-16px" justify-end items-center>
+      <div
+        min-w="72px" max-w="1/4" h-full rounded-12px absolute right-6px top-0
+        hidden md:flex flex="row gap-16px" justify-end items-center
+      >
         <!-- 时间和备案号 -->
-        <div flex="~ col" justify-evenly items-center h-48px>
+        <div hidden lg:flex flex-col justify-evenly items-center h-48px>
           <span text-15px>
             {{ date.toLocaleDateString() }} {{ date.toLocaleTimeString() }}
           </span>
