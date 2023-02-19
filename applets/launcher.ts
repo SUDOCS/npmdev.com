@@ -1,4 +1,5 @@
 import { defineAppletConfig } from './type'
+
 import icon from '@/assets/icons/apps/launcher.svg?url'
 
 export default defineAppletConfig({

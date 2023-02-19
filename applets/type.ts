@@ -1,3 +1,5 @@
+import type { Component } from 'vue'
+
 export interface AppletConfig {
   /* 标识 */
   name: string
@@ -26,6 +28,8 @@ export interface AppletConfig {
 
   /* 应用打开的路由 */
   route?: string
+  /* 应用的桌面组件，统一为组件中包含窗口，窗口中打开frame */
+  desktopComponent?: Component
 }
 
 export const defaultAppleatConfig: Partial<AppletConfig> = {
