@@ -1,11 +1,24 @@
 <script setup lang="ts">
+import { desktopApps } from '@/applets'
+
+const appletStore = useAppletStore()
+const { mountedApps } = storeToRefs(appletStore)
+
+const apps = computed(() => {
+  return desktopApps.filter((app) => {
+    return mountedApps.value.includes(app.name)
+  })
+})
 </script>
 
 <template>
-  <div w-100vw h-100vh overflow-hidden>
+  <div w-100vw h-100vh relative overflow-hidden>
     <DesktopGrid />
     <DesktopDock />
-    <DesktopWindow />
+
+    <ClientOnly>
+      <DesktopWindow v-for="app in apps" :key="app.name" :config="app" />
+    </ClientOnly>
 
     <div fixed top-0 bottom-0 right-0 left-0 z--1>
       <img

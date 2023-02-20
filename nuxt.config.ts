@@ -5,7 +5,16 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/devtools',
     '@unocss/nuxt',
+    '@pinia/nuxt',
+    '@vueuse/nuxt',
+    'nuxt-icon',
   ],
+  imports: {
+    dirs: ['./stores', './applets'],
+  },
+  pinia: {
+    autoImports: ['defineStore', 'storeToRefs'],
+  },
   vite: {
     css: {
       preprocessorOptions: {

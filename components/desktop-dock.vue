@@ -14,6 +14,9 @@ onMounted(() => {
 onUnmounted(() => {
   clearInterval(timer as NodeJS.Timer)
 })
+
+const appletStore = useAppletStore()
+const { mountApp } = appletStore
 </script>
 
 <template>
@@ -27,14 +30,14 @@ onUnmounted(() => {
         min-w="72px" max-w="1/4" h-full rounded-12px absolute left-6px top-0
         hidden md:flex frow flex-gap-16px justify-start
       >
-        <div v-for="app in dockLeftApps" :key="app.name" class="dock-app-entry">
+        <div v-for="app in dockLeftApps" :key="app.name" class="dock-app-entry" @click="mountApp(app.name)">
           <img :src="app.icon" :alt="app.title" wh-full object-fill>
           <span class="dock-tooltip">{{ app.title }}</span>
         </div>
       </div>
       <!-- 中间 -->
       <div max-w-full lg:max-w="1/2" mx-auto h-full rounded-12px flex-center flex-gap-16px>
-        <div v-for="app in dockCenterApps" :key="app.name" class="dock-app-entry">
+        <div v-for="app in dockCenterApps" :key="app.name" class="dock-app-entry" @click="mountApp(app.name)">
           <img :src="app.icon" :alt="app.title" wh-full object-fill>
           <span class="dock-tooltip">{{ app.title }}</span>
         </div>
@@ -55,7 +58,7 @@ onUnmounted(() => {
           <span class="dock-tooltip group-hover:opacity-100">{{ date.toLocaleDateString() }} {{ date.toLocaleTimeString() }}</span>
         </div>
 
-        <div v-for="app in dockRightApps" :key="app.name" class="dock-app-entry">
+        <div v-for="app in dockRightApps" :key="app.name" class="dock-app-entry" @click="mountApp(app.name)">
           <img :src="app.icon" :alt="app.title" wh-full object-fill>
           <span class="dock-tooltip">{{ app.title }}</span>
         </div>
