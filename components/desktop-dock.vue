@@ -49,13 +49,17 @@ const { mountApp } = appletStore
       >
         <!-- 时间和备案号 -->
         <div hidden lg:flex flex-col justify-evenly items-center h-48px relative class="group">
-          <span text-15px>{{ date.toLocaleDateString() }} {{ date.toLocaleTimeString() }}</span>
+          <ClientOnly>
+            <span text-15px>{{ date.toLocaleDateString() }} {{ date.toLocaleTimeString() }}</span>
+          </ClientOnly>
 
           <a text-13px href="https://beian.miit.gov.cn" target="_blank">
             赣ICP备20000000号-1
           </a>
 
-          <span class="dock-tooltip group-hover:opacity-100">{{ date.toLocaleDateString() }} {{ date.toLocaleTimeString() }}</span>
+          <ClientOnly>
+            <span class="dock-tooltip group-hover:opacity-100">{{ date.toLocaleDateString() }} {{ date.toLocaleTimeString() }}</span>
+          </ClientOnly>
         </div>
 
         <div v-for="app in dockRightApps" :key="app.name" class="dock-app-entry" @click="mountApp(app.name)">
