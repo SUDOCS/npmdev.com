@@ -67,8 +67,9 @@ const normalStyle = () => ({
 const minimizedStyle = () => ({
   top: '100%',
   left: '50%',
-  transform: 'translate(-50%, 0) scale(0.1)',
-  transition: 'all 500ms ease-out',
+  transform: 'translate(-50%, 0) scale(0)',
+  transformOrigin: 'center top',
+  transition: 'all 300ms ease-out',
   zIndex: zIndex.value,
 })
 
@@ -79,7 +80,7 @@ const closedStyle = () => {
     left: `${rect.left}px`,
     transform: 'scale(0)',
     transformOrigin: 'center center',
-    transition: 'all 300ms ease-out',
+    transition: 'all 150ms ease-out',
     zIndex: zIndex.value,
   }
 }
@@ -186,7 +187,7 @@ const mouseDown = (e: MouseEvent) => {
 <template>
   <div
     ref="windowEl" bg="#fff/70" shadow border border-solid border-gray-200
-    class="absolute-full lg:(w-360px h-640px absolute-center) fcol rounded-none md:rounded-12px"
+    class="window absolute-full lg:(w-360px h-640px absolute-center) fcol rounded-none md:rounded-12px"
     :style="style"
     @click.stop="zIndex = refreshAppIndex()"
   >
@@ -226,6 +227,20 @@ const mouseDown = (e: MouseEvent) => {
 </template>
 
 <style lang="scss" scoped>
+@keyframes window-in {
+  0%{
+    transform: scale(0.5);
+  }
+
+  100%{
+    transform: scale(1);
+  }
+}
+
+.window{
+  animation: window-in 100ms ease-out;
+}
+
 .window-btn{
   @apply h-42px w-42px lh-42px text-center hover:bg-#000/10 last:rounded-tr-12px;
 }
