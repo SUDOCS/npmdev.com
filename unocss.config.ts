@@ -1,7 +1,6 @@
 import presetWebFonts from '@unocss/preset-web-fonts'
 import transformerDirectives from '@unocss/transformer-directives'
 import transformerVariantGroup from '@unocss/transformer-variant-group'
-import type { Preset } from 'unocss'
 import { presetAttributify, presetIcons, presetUno } from 'unocss'
 import { defineConfig } from 'unocss/vite'
 
@@ -30,12 +29,10 @@ export default defineConfig({
           },
         ],
       },
-    }) as Preset,
+    }),
   ],
   transformers: [
     transformerDirectives(),
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
     transformerVariantGroup(),
   ],
   shortcuts: {

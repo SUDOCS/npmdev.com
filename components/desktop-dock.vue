@@ -23,7 +23,7 @@ const { mountApp } = appletStore
   <div h-80px p-xs fixed bottom-0 left-0 right-0 relative class="animate-[dockin_500ms_ease-out_forwards]">
     <div
       wh-full rounded-12px text-center relative px-12px
-      un-before="content-none absolute-full backdrop-blur-4px bg-[#c2e9fb66] m--4px rounded-12px"
+      un-before="content-none absolute-full backdrop-blur-4px bg-#c2e9fb/40 m--4px rounded-12px"
     >
       <!-- 左边 -->
       <div
