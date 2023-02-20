@@ -86,8 +86,16 @@ const closedStyle = () => {
 }
 
 const style = computed(() => {
-  if (!isLargeScreen.value && state.value !== WindowState.Closed) {
-    return maximizedStyle()
+  if (!isLargeScreen.value) {
+    // 如果不是 PC 端
+    switch (state.value) {
+      case WindowState.Minimized:
+        return minimizedStyle()
+      case WindowState.Closed:
+        return closedStyle()
+      default:
+        return maximizedStyle()
+    }
   }
 
   if (dragging.value) {
