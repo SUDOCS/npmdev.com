@@ -205,11 +205,11 @@ const mouseDown = (e: MouseEvent) => {
           <Icon name="fluent:minimize-24-regular" />
         </div>
         <!-- 取消最大化 -->
-        <div v-if="state !== WindowState.Normal" class="window-btn" @click="doWindowAction(WindowAction.Unmaximize)">
+        <div v-if="state !== WindowState.Normal" class="hidden lg:block window-btn" @click="doWindowAction(WindowAction.Unmaximize)">
           <Icon name="fluent:full-screen-minimize-20-regular" />
         </div>
         <!-- 最大化 -->
-        <div v-if="state !== WindowState.Maximized" class="window-btn" @click="doWindowAction(WindowAction.Maximize)">
+        <div v-if="state !== WindowState.Maximized" class="hidden lg:block window-btn" @click="doWindowAction(WindowAction.Maximize)">
           <Icon name="fluent:full-screen-maximize-20-regular" />
         </div>
         <!-- 关闭 -->
