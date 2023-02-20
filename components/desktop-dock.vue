@@ -19,30 +19,30 @@ onUnmounted(() => {
 <template>
   <div h-80px p-xs fixed bottom-0 left-0 right-0 relative class="animate-[dockin_500ms_ease-out_forwards]">
     <div
-      w-full h-full rounded-12px text-center relative px-12px
-      un-before="content-none absolute top-0 bottom-0 left-0 right-0 backdrop-blur-4px bg-[#c2e9fb66] m--4px rounded-12px"
+      wh-full rounded-12px text-center relative px-12px
+      un-before="content-none absolute-full backdrop-blur-4px bg-[#c2e9fb66] m--4px rounded-12px"
     >
       <!-- 左边 -->
       <div
         min-w="72px" max-w="1/4" h-full rounded-12px absolute left-6px top-0
-        hidden md:flex flex="row gap-16px" justify-start items-center
+        hidden md:flex frow flex-gap-16px justify-start
       >
         <div v-for="app in dockLeftApps" :key="app.name" class="dock-app-entry">
-          <img :src="app.icon" :alt="app.title" w-full h-full object-fill>
+          <img :src="app.icon" :alt="app.title" wh-full object-fill>
           <span class="dock-tooltip">{{ app.title }}</span>
         </div>
       </div>
       <!-- 中间 -->
-      <div max-w-full lg:max-w="1/2" mx-auto h-full rounded-12px flex="~ row gap-16px" justify-center items-center>
+      <div max-w-full lg:max-w="1/2" mx-auto h-full rounded-12px flex-center flex-gap-16px>
         <div v-for="app in dockCenterApps" :key="app.name" class="dock-app-entry">
-          <img :src="app.icon" :alt="app.title" w-full h-full object-fill>
+          <img :src="app.icon" :alt="app.title" wh-full object-fill>
           <span class="dock-tooltip">{{ app.title }}</span>
         </div>
       </div>
       <!-- 右边 -->
       <div
         min-w="72px" max-w="1/4" h-full rounded-12px absolute right-6px top-0
-        hidden md:flex flex="row gap-16px" justify-end items-center
+        hidden md:flex frow flex-gap-16px justify-end
       >
         <!-- 时间和备案号 -->
         <div hidden lg:flex flex-col justify-evenly items-center h-48px relative class="group">
@@ -56,7 +56,7 @@ onUnmounted(() => {
         </div>
 
         <div v-for="app in dockRightApps" :key="app.name" class="dock-app-entry">
-          <img :src="app.icon" :alt="app.title" w-full h-full object-fill>
+          <img :src="app.icon" :alt="app.title" wh-full object-fill>
           <span class="dock-tooltip">{{ app.title }}</span>
         </div>
       </div>
@@ -91,12 +91,10 @@ onUnmounted(() => {
 .dock-tooltip{
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
-  @apply absolute left-50% mx-auto top--40px py-4px px-12px rounded-12px bg-#eee text-black text-12px text-center whitespace-nowrap select-none;
-  transform: translateX(-50%);
+  @apply absolute-x-center mx-auto top--40px py-4px px-12px rounded-12px bg-#eee text-black text-12px text-center whitespace-nowrap select-none;
 
   &:before{
-    @apply absolute top-100% left-50% w-0 h-0 content-none border-6px border-#eee border-solid border-b-transparent border-l-transparent border-r-transparent;
-    transform: translateX(-50%);
+    @apply absolute-x-center top-full w-0 h-0 content-none border-6px border-#eee border-solid border-b-transparent border-l-transparent border-r-transparent;
   }
 }
 </style>

@@ -34,4 +34,13 @@ export default defineConfig({
   transformers: [
     transformerDirectives(),
   ],
+  shortcuts: {
+    'wh-full': 'w-full h-full',
+    'absolute-full': 'absolute inset-0',
+    'absolute-x-center': 'absolute left-1/2 translate-x--1/2',
+    'flex-center': 'flex justify-center items-center',
+    'frow': 'flex flex-row items-center',
+    'fcol': 'flex flex-col items-center',
+    'text-owt': 'overflow-hidden whitespace-nowrap text-ellipsis',
+  },
 })

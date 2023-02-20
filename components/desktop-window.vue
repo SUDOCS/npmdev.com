@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  content
+  <div>这是一个窗口</div>
 </template>
 
 <style lang="scss" scoped>

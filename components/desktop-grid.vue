@@ -9,11 +9,11 @@ import { desktopApps } from '@/applets'
   >
     <div
       v-for="app in desktopApps" :key="app.name"
-      select-none flex="~ col" justify-center items-center rounded-6px p-12px font-bold
+      select-none flex-center flex-col rounded-6px p-12px font-bold
       hover="bg-[#0081ff33]" transition-colors active="bg-[#0081ff66]"
     >
       <img h-48px w-48px object-contain :src="app.icon" :alt="app.title">
-      <span text-white text-13px text-center w-72px overflow-hidden whitespace-nowrap text-ellipsis break-words>
+      <span text-white text-13px text-center w-72px text-owt break-words>
         {{ app.title }}
       </span>
     </div>
