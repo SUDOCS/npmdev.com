@@ -91,7 +91,7 @@ onUnmounted(() => {
 .dock-tooltip{
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
-  @apply absolute left-50% mx-auto top--40px py-4px px-12px rounded-12px bg-#eee text-black text-12px text-center whitespace-nowrap;
+  @apply absolute left-50% mx-auto top--40px py-4px px-12px rounded-12px bg-#eee text-black text-12px text-center whitespace-nowrap select-none;
   transform: translateX(-50%);
 
   &:before{
