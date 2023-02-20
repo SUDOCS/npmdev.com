@@ -25,7 +25,7 @@ onUnmounted(() => {
       <!-- 左边 -->
       <div
         min-w="72px" max-w="1/4" h-full rounded-12px absolute left-6px top-0
-        hidden md:flex flex="row gap-16px" justify-end items-center
+        hidden md:flex flex="row gap-16px" justify-start items-center
       >
         <div v-for="app in dockLeftApps" :key="app.name" class="dock-app-entry">
           <img :src="app.icon" :alt="app.title" w-full h-full object-fill>
