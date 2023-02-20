@@ -45,14 +45,14 @@ onUnmounted(() => {
         hidden md:flex flex="row gap-16px" justify-end items-center
       >
         <!-- 时间和备案号 -->
-        <div hidden lg:flex flex-col justify-evenly items-center h-48px>
-          <span text-15px>
-            {{ date.toLocaleDateString() }} {{ date.toLocaleTimeString() }}
-          </span>
+        <div hidden lg:flex flex-col justify-evenly items-center h-48px relative class="group">
+          <span text-15px>{{ date.toLocaleDateString() }} {{ date.toLocaleTimeString() }}</span>
 
           <a text-13px href="https://beian.miit.gov.cn" target="_blank">
             赣ICP备20000000号-1
           </a>
+
+          <span class="dock-tooltip group-hover:opacity-100">{{ date.toLocaleDateString() }} {{ date.toLocaleTimeString() }}</span>
         </div>
 
         <div v-for="app in dockRightApps" :key="app.name" class="dock-app-entry">
