@@ -41,6 +41,8 @@ export const defaultAppleatConfig: Partial<AppletConfig> = {
 }
 
 export function defineAppletConfig(config: AppletConfig) {
+  config.icon = `/icons/apps/${config.icon}.svg`
+
   for (const key in defaultAppleatConfig) {
     if (config[key] === undefined) {
       config[key] = defaultAppleatConfig[key]
