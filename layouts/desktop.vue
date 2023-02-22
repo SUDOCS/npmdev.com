@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { desktopApps } from '@/applets'
-
+import wallpapers from '@/common/wallpapers'
 const appletStore = useAppletStore()
 const { mountedApps } = storeToRefs(appletStore)
-
+console.log(wallpapers)
 const apps = computed(() => {
   return desktopApps.filter((app) => {
     return mountedApps.value.includes(app.name)
   })
 })
+
+// https://images.unsplash.com/photo-1509565840034-3c385bbe6451?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&q=50
 </script>
 
 <template>
@@ -23,7 +25,7 @@ const apps = computed(() => {
     <div fixed top-0 bottom-0 right-0 left-0 z--1>
       <img
         w-full h-full object-cover class="animate-[bganim_60s_linear_infinite] lg:animate-none"
-        src="https://images.unsplash.com/photo-1509565840034-3c385bbe6451?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&q=50" alt=""
+        :src="assetsWithCDN(wallpapers[Math.ceil(Math.random() * 12) - 1] as unknown as string)"
       >
     </div>
   </div>
