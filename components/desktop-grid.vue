@@ -30,7 +30,7 @@ const onEntryDbClick = (appName: string) => {
       @click="onEntryClick(app.name)"
     >
       <img h-48px w-48px object-contain :src="app.icon" :alt="app.title">
-      <span text-white text-13px text-center w-72px text-owt break-words>
+      <span text-white text-13px text-center w-72px text-owt break-words text-shadow-xl>
         {{ app.title }}
       </span>
     </div>
