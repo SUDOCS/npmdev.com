@@ -40,8 +40,12 @@ export const defaultAppleatConfig: Partial<AppletConfig> = {
   showInDesktop: true,
 }
 
+// as inline 会在资源导入时加上?inline，然后通过vite插件将svg内联
+const icons = import.meta.glob('@/assets/icons/apps/*.svg', { eager: true, as: 'inline' })
+
 export function defineAppletConfig(config: AppletConfig) {
-  config.icon = `/icons/apps/${config.icon}.svg`
+  const iconKey = `/assets/icons/apps/${config.icon}.svg`
+  config.icon = (icons[iconKey] as unknown as { default: string }).default
 
   for (const key in defaultAppleatConfig) {
     if (config[key] === undefined) {
