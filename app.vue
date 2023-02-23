@@ -1,6 +1,8 @@
 <script setup lang="ts">
-onMounted(() => {
-  document.body.classList.add('font-sans')
+useHead({
+  bodyAttrs: {
+    class: 'font-sans',
+  },
 })
 </script>
 
