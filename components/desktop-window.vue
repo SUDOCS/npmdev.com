@@ -40,6 +40,11 @@ enum WindowAction {
 
 const state = ref(WindowState.Normal)
 const oldState = ref(WindowState.Normal)
+const iframeLoaded = ref(false)
+
+const baseStyle = {
+  backgroundColor: props.config.backgroundColor || 'whitesmoke',
+}
 
 const maximizedStyle = () => ({
   top: '0px',
@@ -190,47 +195,70 @@ const mouseDown = (e: MouseEvent) => {
   window.addEventListener('mousemove', drag)
   window.addEventListener('mouseup', dragEnd)
 }
+
+function onIframeLoad() {
+  setTimeout(() => {
+    iframeLoaded.value = true
+  }, 300)
+}
 </script>
 
 <template>
   <div
     ref="windowEl" bg="#fff/70" shadow border border-solid border-gray-200
-    class="window absolute-full lg:(w-360px h-640px absolute-center) fcol rounded-none md:rounded-12px"
-    :style="style"
+    class="window absolute-full lg:(w-360px h-640px absolute-center) fcol rounded-none md:rounded-xl"
+    :style="{ ...baseStyle, ...style }"
     @click.stop="zIndex = refreshAppIndex()"
   >
-    <div absolute top-0 left-0 right-0 h-42px frow justify-between select-none rounded-t-none md:rounded-t-12px>
+    <div
+      absolute top-0 left-0 right-0 h-42px frow justify-between select-none rounded-t-none md:rounded-t-xl
+      hover:bg-white:50 transition-all duration-300 z-1
+    >
       <!-- 图标和名称 -->
       <div frow justify-between pl-12px text-15px flex-gap-6px hover:contrast-200>
         <img :src="config.icon" alt="" w-24px h-24px>
-        <span>{{ config.title }}</span>
+        <ClientOnly>
+          <span>{{ config.title }}</span>
+        </ClientOnly>
       </div>
       <!-- 拖拽区域 -->
       <div flex-1 h-full cursor-move @mousedown.stop="mouseDown" />
       <!-- 按钮 -->
       <div frow>
         <!-- 最小化 -->
-        <div class="window-btn" @click="doWindowAction(WindowAction.Minimize)">
+        <div title="最小化" class="window-btn" @click="doWindowAction(WindowAction.Minimize)">
           <Icon name="fluent:minimize-24-regular" />
         </div>
         <!-- 取消最大化 -->
-        <div v-if="state !== WindowState.Normal" class="hidden lg:block window-btn" @click="doWindowAction(WindowAction.Unmaximize)">
+        <div v-if="state !== WindowState.Normal" title="取消最大化" class="hidden lg:block window-btn" @click="doWindowAction(WindowAction.Unmaximize)">
           <Icon name="fluent:full-screen-minimize-20-regular" />
         </div>
         <!-- 最大化 -->
-        <div v-if="state !== WindowState.Maximized" class="hidden lg:block window-btn" @click="doWindowAction(WindowAction.Maximize)">
+        <div v-if="state !== WindowState.Maximized" title="最大化" class="hidden lg:block window-btn" @click="doWindowAction(WindowAction.Maximize)">
           <Icon name="fluent:full-screen-maximize-20-regular" />
         </div>
         <!-- 关闭 -->
-        <div class="window-btn" @click="doWindowAction(WindowAction.Close)">
+        <div class="window-btn" title="关闭" @click="doWindowAction(WindowAction.Close)">
           <Icon name="clarity:window-close-line" />
         </div>
       </div>
     </div>
     <!-- 占标题栏的位置 -->
-    <div h-42px />
+    <div v-if="!config.customTitleBar" h-42px />
 
-    <div flex-1 w-full />
+    <div flex-1 w-full relative>
+      <!-- 开屏幕画面 -->
+
+      <Transition name="fade">
+        <div
+          v-if="!iframeLoaded"
+          absolute-full flex-center bg-white :class="{ 'rounded-xl': config.customTitleBar && isLargeScreen }"
+        >
+          <img :src="config.icon" class="splash-icon">
+        </div>
+      </Transition>
+      <iframe :src="config.route" :class="{ 'rounded-xl': config.customTitleBar && isLargeScreen }" @load="onIframeLoad" />
+    </div>
   </div>
 </template>
 
@@ -245,11 +273,40 @@ const mouseDown = (e: MouseEvent) => {
   }
 }
 
+@keyframes splash-icon {
+  0%{
+    transform: translateY(-50%);
+  }
+  100%{
+    transform: translateY(0%);
+  }
+}
+
 .window{
   animation: window-in 100ms ease-out;
 }
 
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
 .window-btn{
-  @apply h-42px w-42px lh-42px text-center hover:bg-#000/10 last:rounded-tr-12px;
+  @apply h-42px w-42px lh-42px text-center hover:bg-#000/10 last:rounded-tr-xl;
+}
+
+.splash-icon{
+  animation: splash-icon 500ms ease-in infinite alternate;
+}
+
+iframe{
+  width: 100%;
+  height: 100%;
+  border: none;
 }
 </style>
