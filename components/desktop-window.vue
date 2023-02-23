@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import type { AppletConfig } from '@/applets/type'
+import { toPixelVal } from '@/utils/pixel'
 
 const props = withDefaults(defineProps<{
   config: AppletConfig
-  width?: number
-  height?: number
+  width?: string
+  height?: string
 }>(), {
-  width: 360,
-  height: 640,
+  width: '45vh',
+  height: '80vh',
 })
 
 const appletStore = useAppletStore()
@@ -19,8 +20,8 @@ const isLargeScreen = useMediaQuery('(min-width: 1024px)')
 const windowEl = ref(null)
 const width = ref(props.width)
 const height = ref(props.height)
-const top = ref(window.innerHeight / 2 - height.value / 2)
-const left = ref(window.innerWidth / 2 - width.value / 2)
+const top = ref(`calc(50% - ${height.value} / 2)`)
+const left = ref(`calc(50% - ${width.value} / 2)`)
 
 const dragging = ref(false)
 
@@ -60,10 +61,10 @@ const maximizedStyle = () => ({
 })
 
 const normalStyle = () => ({
-  top: `${top.value}px`,
-  left: `${left.value}px`,
-  width: `${width.value}px`,
-  height: `${height.value}px`,
+  top: top.value,
+  left: left.value,
+  width: width.value,
+  height: height.value,
   transform: 'none',
   transition: 'all 150ms ease-out',
   zIndex: zIndex.value,
@@ -158,7 +159,6 @@ function doWindowAction(action: WindowAction) {
 
 const mouseDown = (e: MouseEvent) => {
   e.preventDefault()
-  dragging.value = true
   zIndex.value = refreshAppIndex()
   const { clientX, clientY } = e
 
@@ -166,19 +166,27 @@ const mouseDown = (e: MouseEvent) => {
   let offsetX = clientX - windowLeft
   let offsetY = clientY - windowTop
 
-  // 当鼠标相对窗口位置超过窗口宽度时（最大化转正常状态），需要按比例转换，必然鼠标会在窗口外
-  if (offsetX > width.value) {
-    offsetX *= width.value / window.innerWidth
-    offsetY *= height.value / window.innerHeight
+  // 最大化转正常状态，需要按比例转换，不然鼠标可能飘会在窗口外
+  if (state.value === WindowState.Maximized) {
+    // width.value 是字符串，单位可能不是像素，需要转换
+    offsetX *= toPixelVal(width.value) / window.innerWidth
+    offsetY *= toPixelVal(height.value) / window.innerHeight
   }
+
+  // 鼠标按下去，还没开始拖动就要更新top和left，否则从最大化状态下拖动时，刚开始时会有一段距离的抖动
+  top.value = `${clientY - offsetY}px`
+  left.value = `${clientX - offsetX}px`
+  // dragging 为 true 时，style 计算属性更新，要先更新好 top 和 left
+  dragging.value = true
 
   const drag = (e: MouseEvent) => {
     const { clientX, clientY } = e
-    top.value = clientY - offsetY
-    left.value = clientX - offsetX
+    const topVal = clientY - offsetY
+    top.value = `${topVal}px`
+    left.value = `${clientX - offsetX}px`
 
-    if (top.value < 0) {
-      top.value = 0
+    if (topVal < 0) {
+      top.value = '0px'
       state.value = WindowState.Maximized
     }
     else {
