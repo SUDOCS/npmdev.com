@@ -16,6 +16,7 @@ specifiers:
   esno: ^0.16.3
   husky: ^8.0.3
   lint-staged: ^13.1.2
+  mini-svg-data-uri: ^1.4.4
   nuxt: ^3.2.2
   nuxt-icon: ^0.3.2
   sass: ^1.58.3
@@ -37,6 +38,7 @@ devDependencies:
   esno: 0.16.3
   husky: 8.0.3
   lint-staged: 13.1.2
+  mini-svg-data-uri: 1.4.4
   nuxt: 3.2.2_h4fnh25vzwmk3hy62tksygpjya
   nuxt-icon: 0.3.2
   sass: 1.58.3
@@ -5834,6 +5836,11 @@ packages:
   /min-indent/1.0.1:
     resolution: {integrity: sha512-I9jwMn07Sy/IwOj3zVkVik2JTvgpaykDZEigL6Rx6N9LbMywwUSMtxET+7lVoDLLd3O3IXwJwvuuns8UB/HeAg==}
     engines: {node: '>=4'}
+    dev: true
+
+  /mini-svg-data-uri/1.4.4:
+    resolution: {integrity: sha512-r9deDe9p5FJUPZAk3A59wGH7Ii9YrjjWw0jmw/liSbHl2CHiyXj6FcDXDu2K3TjVAXqiJdaw3xxwlZZr9E6nHg==}
+    hasBin: true
     dev: true
 
   /minimatch/3.0.8:

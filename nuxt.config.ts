@@ -1,3 +1,6 @@
+import fs from 'fs'
+import path from 'path'
+import svgToMiniDataURI from 'mini-svg-data-uri'
 import { defineNuxtConfig } from 'nuxt/config'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
@@ -23,9 +26,21 @@ export default defineNuxtConfig({
         },
       },
     },
+    plugins: [
+      {
+        name: 'svg-inline-loader',
+        enforce: 'pre',
+        load(id) {
+          if (!id.endsWith('.svg?inline'))
+            return
+
+          const svg = fs.readFileSync(path.resolve(id.replace('?inline', '')), 'utf-8')
+          return `export default "${svgToMiniDataURI(svg)}"`
+        },
+      },
+    ],
   },
   css: [
     '@/assets/common.scss',
   ],
-  ssr: false,
 })

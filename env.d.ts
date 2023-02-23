@@ -1,2 +1,1 @@
-declare module "*.svg";
-declare module "*.svg?url";
+/// <reference types="vite/client" />
