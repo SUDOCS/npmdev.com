@@ -8,4 +8,6 @@ export default defineAppletConfig({
   backgroundColor: '#EAEAEA',
   customTitleBar: true,
   route: '/computer',
+  windowWidth: '36vh',
+  windowHeight: '64vh',
 })

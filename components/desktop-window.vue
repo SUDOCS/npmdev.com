@@ -2,14 +2,9 @@
 import type { AppletConfig } from '@/applets/type'
 import { toPixelVal } from '@/utils/pixel'
 
-const props = withDefaults(defineProps<{
+const props = defineProps<{
   config: AppletConfig
-  width?: string
-  height?: string
-}>(), {
-  width: '45vh',
-  height: '80vh',
-})
+}>()
 
 const appletStore = useAppletStore()
 const { unmountApp, clearActiveApp, refreshAppIndex } = appletStore
@@ -18,8 +13,8 @@ const zIndex = ref(refreshAppIndex())
 const isLargeScreen = useMediaQuery('(min-width: 1024px)')
 
 const windowEl = ref(null)
-const width = ref(props.width)
-const height = ref(props.height)
+const width = ref(props.config.windowWidth || '45vh')
+const height = ref(props.config.windowHeight || '80vh')
 const top = ref(`calc(50% - ${height.value} / 2)`)
 const left = ref(`calc(50% - ${width.value} / 2)`)
 
