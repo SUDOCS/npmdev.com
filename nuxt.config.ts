@@ -31,6 +31,7 @@ export default defineNuxtConfig({
     plugins: [
       {
         name: 'svg-inline-loader',
+        enforce: 'pre',
         load(id) {
           if (!id.endsWith('.svg?inline'))
             return
@@ -41,6 +42,7 @@ export default defineNuxtConfig({
       },
       {
         name: 'wallpaper-auto-scanner',
+        enforce: 'pre',
         resolveId(id) {
           if (id === wallpaperModuleId)
             return id
