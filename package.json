@@ -6,8 +6,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "list-wallpapers": "esno scripts/wallpapers.ts"
+    "postinstall": "nuxt prepare"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.35.2",
