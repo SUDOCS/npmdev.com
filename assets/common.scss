@@ -4,7 +4,46 @@
     box-sizing: border-box;
 }
 
-*,::after,::before {
+*::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+*::-webkit-scrollbar-track{
+    width: 0;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: #994800;
+    border-radius: 10px;
+    background-image: -webkit-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 10%,
+        #e56c00 10%,
+        #e56c00 20%,
+        #fbc08d 20%,
+        #fbc08d 30%,
+        transparent 30%,
+        transparent 40%,
+        #e56c00 40%,
+        #e56c00 50%,
+        #fbc08d 50%,
+        #fbc08d 60%,
+        transparent 60%,
+        transparent 70%,
+        #e56c00 70%,
+        #e56c00 80%,
+        #fbc08d 80%,
+        #fbc08d 90%,
+        transparent 90%,
+        transparent
+    );
+}
+
+*,
+::after,
+::before {
     --un-rotate: 0;
     --un-rotate-x: 0;
     --un-rotate-y: 0;
@@ -36,7 +75,7 @@
     --un-ring-offset-width: 0px;
     --un-ring-offset-color: #fff;
     --un-ring-width: 0px;
-    --un-ring-color: rgba(147,197,253,.5);
+    --un-ring-color: rgba(147, 197, 253, 0.5);
     --un-blur: ;
     --un-brightness: ;
     --un-contrast: ;
@@ -54,10 +93,10 @@
     --un-backdrop-invert: ;
     --un-backdrop-opacity: ;
     --un-backdrop-saturate: ;
-    --un-backdrop-sepia:
+    --un-backdrop-sepia: ;
 }
 
-a{
+a {
     text-decoration: none;
     color: inherit;
 }
