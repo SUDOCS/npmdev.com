@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import wallpapers from 'virtual:wallpaper-auto-scanner'
+
+useHead({
+  title: 'Computer Applet',
+})
 </script>
 
 <template>

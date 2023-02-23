@@ -12,6 +12,12 @@ const apps = computed(() => {
 })
 
 // https://images.unsplash.com/photo-1509565840034-3c385bbe6451?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&q=50
+
+const route = useRoute()
+
+useHead({
+  title: route.meta.title as unknown as string,
+})
 </script>
 
 <template>
