@@ -7,4 +7,5 @@ export default defineAppletConfig({
   enableMinimize: false,
   backgroundColor: '#EAEAEA',
   customTitleBar: true,
+  route: '/computer',
 })
