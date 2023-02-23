@@ -214,13 +214,16 @@ function onIframeLoad() {
 <template>
   <div
     ref="windowEl" bg="#fff/70" shadow border border-solid border-gray-200
-    class="window absolute-full lg:(w-360px h-640px absolute-center) fcol rounded-none md:rounded-xl"
+    class="window absolute-full lg:(w-360px h-640px absolute-center) fcol rounded-none lg:rounded-xl"
     :style="{ ...baseStyle, ...style }"
     @click.stop="zIndex = refreshAppIndex()"
   >
+    <!-- 标题栏底部蒙层 -->
+    <div absolute top-0 left-0 right-0 h-42px bg-gradient-to-b from-white:70 to-white:10 blur-1px rounded-t-none lg:rounded-t-xl z-1 />
+
     <div
-      absolute top-0 left-0 right-0 h-42px frow justify-between select-none rounded-t-none md:rounded-t-xl
-      hover:bg-white:50 transition-all duration-300 z-1
+      absolute top-0 left-0 right-0 h-42px frow justify-between select-none rounded-t-none lg:rounded-t-xl
+      transition-all duration-300 z-2
     >
       <!-- 图标和名称 -->
       <div frow justify-between pl-12px text-15px flex-gap-6px hover:contrast-200>
