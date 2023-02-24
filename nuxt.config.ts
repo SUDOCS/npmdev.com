@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import svgToMiniDataURI from 'mini-svg-data-uri'
 import { defineNuxtConfig } from 'nuxt/config'
+import viteCompression from 'vite-plugin-compression'
 
 const wallpaperModuleId = 'virtual:wallpaper-auto-scanner'
 
@@ -55,6 +56,10 @@ export default defineNuxtConfig({
           }
         },
       },
+      viteCompression(),
+      viteCompression({
+        algorithm: 'brotliCompress',
+      }),
     ],
   },
   css: [

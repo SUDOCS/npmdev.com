@@ -21,6 +21,7 @@ specifiers:
   nuxt-icon: ^0.3.2
   sass: ^1.58.3
   typescript: ^4.9.5
+  vite-plugin-compression: ^0.5.1
 
 devDependencies:
   '@antfu/eslint-config': 0.35.2_7kw3g6rralp5ps6mg3uyzz6azm
@@ -43,6 +44,7 @@ devDependencies:
   nuxt-icon: 0.3.2
   sass: 1.58.3
   typescript: 4.9.5
+  vite-plugin-compression: 0.5.1
 
 packages:
 
@@ -8429,6 +8431,18 @@ packages:
       vscode-languageserver: 7.0.0
       vscode-languageserver-textdocument: 1.0.8
       vscode-uri: 3.0.7
+    dev: true
+
+  /vite-plugin-compression/0.5.1:
+    resolution: {integrity: sha512-5QJKBDc+gNYVqL/skgFAP81Yuzo9R+EAf19d+EtsMF/i8kFUpNi3J/H01QD3Oo8zBQn+NzoCIFkpPLynoOzaJg==}
+    peerDependencies:
+      vite: '>=2.0.0'
+    dependencies:
+      chalk: 4.1.2
+      debug: 4.3.4
+      fs-extra: 10.1.0
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /vite-plugin-inspect/0.7.15:
