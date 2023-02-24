@@ -6,7 +6,8 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "pack": "esno ./scripts/pack.ts"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.35.2",
@@ -20,6 +21,7 @@
     "@unocss/transformer-directives": "^0.50.0",
     "@unocss/transformer-variant-group": "^0.50.0",
     "@vueuse/nuxt": "^9.13.0",
+    "compressing": "^1.7.0",
     "eslint": "^8.34.0",
     "esno": "^0.16.3",
     "husky": "^8.0.3",
