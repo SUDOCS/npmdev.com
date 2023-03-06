@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { execa } from 'execa'
+import fg from 'fast-glob'
 import svgToMiniDataURI from 'mini-svg-data-uri'
 import { defineNuxtConfig } from 'nuxt/config'
 import viteCompression from 'vite-plugin-compression'
@@ -53,8 +54,8 @@ export default defineNuxtConfig({
         },
         load(id) {
           if (id === wallpaperModuleId) {
-            const files = fs.readdirSync(path.resolve('./public/wallpapers'))
-            const wallpapers = files.map(file => `/wallpapers/${file}`)
+            const files = fg.sync(['public/wallpapers/*.webp'], { onlyFiles: true })
+            const wallpapers = files.map(file => file.replace('public/', '/'))
             return `export default ${JSON.stringify(wallpapers)}`
           }
         },
