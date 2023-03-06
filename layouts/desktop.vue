@@ -35,8 +35,13 @@ function loadBackground() {
   img.src = bg
 }
 
+const isLargeScreen = useMediaQuery('(min-width: 1024px)')
+
 onMounted(() => {
   loadBackground()
+  if (isLargeScreen.value) {
+    appletStore.mountApp('computer')
+  }
 })
 </script>
 
