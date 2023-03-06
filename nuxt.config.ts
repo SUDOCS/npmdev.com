@@ -69,9 +69,9 @@ export default defineNuxtConfig({
         async load(id) {
           if (id === buildInfoModuleId) {
             let commitHash
-            if (process.env.VERCEL) {
-              // 在 Vercel 中运行
-              commitHash = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) as string
+            if (process.env.VERCEL || process.env.CI) {
+              // 在 Vercel 或 CI 中运行
+              commitHash = (process.env.VERCEL_GIT_COMMIT_SHA || process.env.GITHUB_SHA)?.slice(0, 7) as string
             }
             else {
               // 在本地运行
