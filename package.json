@@ -7,7 +7,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "pack": "esno ./scripts/pack.ts"
+    "tgz": "esno ./scripts/tgz.ts"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.35.3",
