@@ -56,8 +56,10 @@ const favicons = {
           <tr>
             <td>构建时间</td>
             <td>
-              {{ new Date(buildInfo.buildDate).toLocaleDateString() }}
-              {{ new Date(buildInfo.buildDate).toLocaleTimeString() }}
+              <ClientOnly>
+                {{ new Date(buildInfo.buildDate).toLocaleDateString() }}
+                {{ new Date(buildInfo.buildDate).toLocaleTimeString() }}
+              </ClientOnly>
             </td>
           </tr>
         </tbody>
@@ -74,7 +76,7 @@ const favicons = {
 
       <div frow gap-sm flex-wrap>
         <div v-for="name in Object.keys(favicons)" :key="name" flex-1 text-center>
-          <div flex-center w-3em h-3em p-0.5rem rounded-xl mx-auto border border-solid border-black:10>
+          <div flex-center w-3em h-3em p-0.5rem rounded-xl mx-auto border border-solid border-black:10 hover="bg-#000/5" transition>
             <img :src="favicons[name]" :alt="name" w-full h-full>
           </div>
         </div>
@@ -86,8 +88,8 @@ const favicons = {
     </div>
 
     <div
-      v-for="x in 4" :key="x" inline-block bg-white rounded-xl p-xl shadow-xl flex-1
-      min-w-75 lg:min-w-120
+      v-for="x in 0" :key="x" inline-block bg-white rounded-xl p-xl shadow-xl flex-1
+      min-w-75 lg:min-w-120 text-justify
     >
       这里是其他内容
       这里是其他内容
@@ -104,11 +106,17 @@ const favicons = {
 </template>
 
 <style lang="scss" scoped>
-// tr td:first-child{
-//   width: 100px;
-// }
+tr{
+  @apply text-justify;
 
-tr td:last-child{
-  text-align: right;
+  td{
+    &:first-child{
+      text-align: left;
+    }
+
+    &:last-child{
+      text-align: right;
+    }
+  }
 }
 </style>

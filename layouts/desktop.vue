@@ -25,7 +25,7 @@ const bgSrc = ref('')
 
 function loadBackground() {
   const img = new Image()
-  const bg = wallpapers[Math.ceil(Math.random() * wallpapers.length) - 1]
+  const bg = wallpapers[6]
 
   img.onload = () => {
     bgLoaded.value = true
