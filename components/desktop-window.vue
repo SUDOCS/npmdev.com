@@ -68,6 +68,8 @@ const normalStyle = () => ({
 const minimizedStyle = () => ({
   top: '100%',
   left: '50%',
+  width: width.value,
+  height: height.value,
   transform: 'translate(-50%, 0) scale(0)',
   transformOrigin: 'center top',
   transition: 'all 300ms ease-out',
@@ -79,6 +81,8 @@ const closedStyle = () => {
   return {
     top: `${rect.top}px`,
     left: `${rect.left}px`,
+    width: width.value,
+    height: height.value,
     transform: 'scale(0)',
     transformOrigin: 'center center',
     transition: 'all 150ms ease-out',
