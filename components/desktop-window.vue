@@ -65,24 +65,27 @@ const normalStyle = () => ({
   zIndex: zIndex.value,
 })
 
-const minimizedStyle = () => ({
-  top: '100%',
-  left: '50%',
-  width: width.value,
-  height: height.value,
-  transform: 'translate(-50%, 0) scale(0)',
-  transformOrigin: 'center top',
-  transition: 'all 300ms ease-out',
-  zIndex: zIndex.value,
-})
+const minimizedStyle = () => {
+  const rect = (windowEl.value as unknown as HTMLElement).getBoundingClientRect()
+  return {
+    top: '100%',
+    left: '50%',
+    width: `${rect.width}px}`,
+    height: `${rect.height}px`,
+    transform: 'translate(-50%, 0) scale(0)',
+    transformOrigin: 'center top',
+    transition: 'all 300ms ease-out',
+    zIndex: zIndex.value,
+  }
+}
 
 const closedStyle = () => {
   const rect = (windowEl.value as unknown as HTMLElement).getBoundingClientRect()
   return {
     top: `${rect.top}px`,
     left: `${rect.left}px`,
-    width: width.value,
-    height: height.value,
+    width: `${rect.width}px}`,
+    height: `${rect.height}px`,
     transform: 'scale(0)',
     transformOrigin: 'center center',
     transition: 'all 150ms ease-out',
