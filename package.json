@@ -1,5 +1,8 @@
 {
+  "name": "virtual-web-desktop",
+  "version": "0.1.0",
   "private": true,
+  "author": "SUDOCS",
   "scripts": {
     "prepare": "husky install",
     "build": "nuxt build",
@@ -24,6 +27,7 @@
     "compressing": "^1.8.0",
     "eslint": "^8.35.0",
     "esno": "^0.16.3",
+    "execa": "^7.0.0",
     "husky": "^8.0.3",
     "lint-staged": "^13.1.2",
     "mini-svg-data-uri": "^1.4.4",

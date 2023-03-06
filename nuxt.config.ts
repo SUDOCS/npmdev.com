@@ -1,10 +1,13 @@
 import fs from 'fs'
 import path from 'path'
+import { execa } from 'execa'
 import svgToMiniDataURI from 'mini-svg-data-uri'
 import { defineNuxtConfig } from 'nuxt/config'
 import viteCompression from 'vite-plugin-compression'
+import { author, devDependencies, name, version } from './package.json'
 
 const wallpaperModuleId = 'virtual:wallpaper-auto-scanner'
+const buildInfoModuleId = 'virtual:build-info'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -56,6 +59,28 @@ export default defineNuxtConfig({
           }
         },
       },
+      {
+        name: 'build-info',
+        enforce: 'pre',
+        resolveId(id) {
+          if (id === buildInfoModuleId)
+            return id
+        },
+        async load(id) {
+          if (id === buildInfoModuleId) {
+            const { stdout } = await execa('git rev-parse --short HEAD')
+            const buildInfo: BuildInfo = {
+              name,
+              version,
+              commitHash: stdout.trim(),
+              author,
+              devDependencies,
+              buildDate: new Date().valueOf(),
+            }
+            return `export default ${JSON.stringify(buildInfo)}`
+          }
+        },
+      },
       viteCompression(),
       viteCompression({
         algorithm: 'brotliCompress',
@@ -65,5 +90,5 @@ export default defineNuxtConfig({
   css: [
     '@/assets/common.scss',
   ],
-  // ssr: false,
+  ssr: false,
 })
