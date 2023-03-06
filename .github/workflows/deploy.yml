@@ -17,13 +17,16 @@ jobs:
           node-version: "18"
       - name: Install dependencies
         run: npm install
-      - name: Build Site
+      - name: Build
         run: npm run build
+      - name: Compress output
+        run: npm run tgz
       - name: Sync files
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./.deploy/
       - name: Call Webhook
         run: curl -X GET ${{ secrets.WEBHOOK_URL }}
