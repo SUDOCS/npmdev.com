@@ -28,5 +28,6 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./.deploy/
+          server-dir: /deploy/
       - name: Call Webhook
         run: curl -X GET ${{ secrets.WEBHOOK_URL }}
