@@ -11,10 +11,12 @@ tgzStream.addEntry(resolve(__dirname, '../ecosystem.config.js'))
 
 fs.mkdirSync(resolve(__dirname, '../.deploy'), { recursive: true })
 
-const destStream = fs.createWriteStream(resolve(__dirname, '../.deploy/output.tgz'))
+const target = resolve(__dirname, '../.deploy/output.tgz')
+const destStream = fs.createWriteStream(target)
 
 tgzStream.pipe(destStream)
   .on('finish', () => {
+    console.log('save to', resolve(__dirname, '../.deploy/output.tgz'), 'size', fs.statSync(target).size / 1024 / 1024, 'MB')
     console.log('compress finished')
   })
   .on('error', (err) => {
