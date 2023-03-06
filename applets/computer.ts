@@ -5,6 +5,7 @@ export default defineAppletConfig({
   title: '计算机',
   icon: 'computer',
   enableMinimize: false,
+  enableMaximize: false,
   backgroundColor: '#EAEAEA',
   customTitleBar: true,
   route: '/computer',

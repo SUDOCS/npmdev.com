@@ -13,8 +13,8 @@ const zIndex = ref(refreshAppIndex())
 const isLargeScreen = useMediaQuery('(min-width: 1024px)')
 
 const windowEl = ref(null)
-const width = ref(props.config.windowWidth || '45vh')
-const height = ref(props.config.windowHeight || '80vh')
+const width = ref(props.config.windowWidth || '96vh')
+const height = ref(props.config.windowHeight || '54vh')
 const top = ref(`calc(50% - ${height.value} / 2)`)
 const left = ref(`calc(50% - ${width.value} / 2)`)
 
@@ -232,15 +232,15 @@ function onIframeLoad() {
       <!-- 按钮 -->
       <div frow>
         <!-- 最小化 -->
-        <div title="最小化" class="window-btn" @click="doWindowAction(WindowAction.Minimize)">
+        <div v-if="config.enableMinimize" title="最小化" class="window-btn" @click="doWindowAction(WindowAction.Minimize)">
           <Icon name="fluent:minimize-24-regular" />
         </div>
         <!-- 取消最大化 -->
-        <div v-if="state !== WindowState.Normal" title="取消最大化" class="hidden lg:block window-btn" @click="doWindowAction(WindowAction.Unmaximize)">
+        <div v-if="config.enableMaximize && state !== WindowState.Normal" title="取消最大化" class="hidden lg:block window-btn" @click="doWindowAction(WindowAction.Unmaximize)">
           <Icon name="fluent:full-screen-minimize-20-regular" />
         </div>
         <!-- 最大化 -->
-        <div v-if="state !== WindowState.Maximized" title="最大化" class="hidden lg:block window-btn" @click="doWindowAction(WindowAction.Maximize)">
+        <div v-if="config.enableMaximize && state !== WindowState.Maximized" title="最大化" class="hidden lg:block window-btn" @click="doWindowAction(WindowAction.Maximize)">
           <Icon name="fluent:full-screen-maximize-20-regular" />
         </div>
         <!-- 关闭 -->
