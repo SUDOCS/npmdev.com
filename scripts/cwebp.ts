@@ -8,5 +8,5 @@ const allImages: string[] = fg.sync(['public/wallpapers/*.jpg', 'public/wallpape
 allImages.forEach(async (image) => {
   console.log(`Converting ${image} to webp`)
   await execa('cwebp', ['-q', '80', image, '-o', `${image.replace(/\.(jpg|png|jpeg)$/, '.webp')}`])
-  // await execa('rimraf', [image])
+  await execa('rimraf', [image])
 })
