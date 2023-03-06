@@ -60,7 +60,7 @@ export default defineNuxtConfig({
         },
       },
       {
-        name: 'build-info',
+        name: 'build-info-generator',
         enforce: 'pre',
         resolveId(id) {
           if (id === buildInfoModuleId)
@@ -98,5 +98,5 @@ export default defineNuxtConfig({
   css: [
     '@/assets/common.scss',
   ],
-  ssr: false,
+  ssr: process.env.NODE_ENV === 'production',
 })
