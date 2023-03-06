@@ -7,6 +7,7 @@ useHead({
 })
 
 const favicons = {
+  node: 'https://nodejs.org/static/images/favicons/apple-touch-icon.png',
   typescript: 'https://www.typescriptlang.org/icons/icon-256x256.png',
   vue: 'https://vuejs.org/logo.svg',
   nuxt: 'https://nuxt.com/icon.png',
@@ -14,6 +15,8 @@ const favicons = {
   vueuse: 'https://vueuse.org/favicon.svg',
   unocss: 'https://cdn.jsdelivr.net/gh/unocss/unocss/playground/public/icon.svg',
   vite: 'https://cn.vitejs.dev/logo.svg',
+  sass: 'https://sass-lang.com/assets/img/logos/logo-b6e1ef6e.svg',
+  eslint: 'https://eslint.org/apple-touch-icon.png',
 }
 </script>
 
@@ -33,7 +36,7 @@ const favicons = {
   <div mt--3vh w-90vw mx-auto gap-xl flex flex-row flex-wrap justify-evenly pb-xl>
     <div
       inline-block bg-white rounded-xl p-xl shadow-xl flex-1
-      min-w-75 lg:min-w-120
+      min-w-full lg:min-w-120
     >
       <table w-full>
         <tbody>
@@ -68,7 +71,7 @@ const favicons = {
 
     <div
       inline-block bg-white rounded-xl p-xl shadow-xl flex-1
-      min-w-75 lg:min-w-120
+      min-w-full lg:min-w-120
     >
       <div w-full text-center pb-sm>
         <span>基于</span>
@@ -89,7 +92,7 @@ const favicons = {
 
     <div
       v-for="x in 0" :key="x" inline-block bg-white rounded-xl p-xl shadow-xl flex-1
-      min-w-75 lg:min-w-120 text-justify
+      min-w="75%" lg:min-w-120 text-justify
     >
       这里是其他内容
       这里是其他内容
