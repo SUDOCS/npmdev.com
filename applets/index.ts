@@ -28,8 +28,8 @@ export default AllApps
 
 export const desktopApps = AllApps.filter(app => app.showInDesktop)
 
-export const dockLeftApps = AllApps.filter(app => app.dockArea === 'left')
+export const dockLeftApps = AllApps.filter(app => app.dockArea === 'left' && app.showInDock)
 
-export const dockRightApps = AllApps.filter(app => app.dockArea === 'right')
+export const dockRightApps = AllApps.filter(app => app.dockArea === 'right' && app.showInDock)
 
-export const dockCenterApps = AllApps.filter(app => app.dockArea === 'center')
+export const dockCenterApps = AllApps.filter(app => app.dockArea === 'center' && app.showInDock)

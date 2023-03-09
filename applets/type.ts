@@ -20,6 +20,7 @@ export interface AppletConfig {
   dockArea?: 'left' | 'right' | 'center'
   /* 是否在桌面展示图标 */
   showInDesktop?: boolean
+  showInDock?: boolean
 
   /* 窗口默认宽度 */
   windowWidth?: string
@@ -38,6 +39,7 @@ export const defaultAppleatConfig: Partial<AppletConfig> = {
   customTitleBar: false,
   dockArea: 'center',
   showInDesktop: true,
+  showInDock: true,
 }
 
 // as inline 会在资源导入时加上?inline，然后通过vite插件将svg内联

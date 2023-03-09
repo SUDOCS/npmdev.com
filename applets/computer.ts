@@ -8,6 +8,7 @@ export default defineAppletConfig({
   enableMaximize: false,
   backgroundColor: '#EAEAEA',
   customTitleBar: true,
+  showInDock: false,
   route: '/computer',
   windowWidth: '36vh',
   windowHeight: '64vh',
