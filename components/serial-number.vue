@@ -17,7 +17,12 @@ const isLargeScreen = useMediaQuery('(min-width: 1024px)')
 function activeInput() {
   inputEl.value?.focus()
   if (active.value === -1) {
-    active.value = text.value.length - 1
+    if (text.value.length === 0) {
+      active.value = 0
+    }
+    else {
+      active.value = text.value.length - 1
+    }
   }
 }
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const props = withDefaults(defineProps<{
-  theme: 'light' | 'dark'
-  size: 'small' | 'medium' | 'large'
+  theme?: 'light' | 'dark'
+  size?: 'small' | 'medium' | 'large'
 }>(), {
   theme: 'dark',
   size: 'small',
