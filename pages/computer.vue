@@ -7,7 +7,7 @@ useHead({
 })
 
 const favicons = {
-  node: 'https://nodejs.org/static/images/favicons/apple-touch-icon.png',
+  node: 'https://nodejs.org/static/images/logo-hexagon-card.png',
   typescript: 'https://www.typescriptlang.org/icons/icon-256x256.png',
   vue: 'https://vuejs.org/logo.svg',
   nuxt: 'https://nuxt.com/icon.png',

@@ -10,23 +10,18 @@ const props = withDefaults(defineProps<{
 const emits = defineEmits(['update:value'])
 
 const text = ref(props.value)
-const active = ref(props.value.length - 1)
+const active = ref(-1)
 const inputEl = ref<HTMLInputElement>()
-
-function onClicked(event: Event) {
-  const target = event.target
-  console.log(target)
-}
+const isLargeScreen = useMediaQuery('(min-width: 1024px)')
 
 function activeInput() {
   inputEl.value?.focus()
   if (active.value === -1) {
-    active.value = 0
+    active.value = text.value.length - 1
   }
 }
 
 function onInputChange(event: Event) {
-//   console.log('input change', event)
   const val = (event.target as HTMLInputElement).value
   if (val.length > props.length) {
     text.value = val.slice(0, props.length)
@@ -40,8 +35,9 @@ function onInputChange(event: Event) {
 }
 
 onMounted(() => {
-  if (props.value.length > 0) {
+  if (props.value.length > 0 && isLargeScreen.value) {
     (inputEl.value as HTMLInputElement).focus()
+    active.value = props.value.length - 1
   }
 })
 </script>
@@ -49,7 +45,7 @@ onMounted(() => {
 <template>
   <div relative text-20px @click="activeInput">
     <input ref="inputEl" type="text" :value="props.value" class="serial-number-input" @input="onInputChange">
-    <div frow gap-1em flex-center flex-wrap @click="onClicked">
+    <div frow gap-1em flex-center flex-wrap>
       <div
         v-for="(_, idx) in length" :key="idx" class="serial-number-box"
         :class="{ 'serial-number-box-active': active === idx }"
