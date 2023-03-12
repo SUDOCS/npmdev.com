@@ -97,3 +97,52 @@ export function parseRoomInfo(payload: ArrayBuffer): RoomInfo {
     users,
   }
 }
+
+export enum WsRTCAction {
+  IceCandidate = 1,
+  Offer,
+  Answer,
+}
+
+// WsData 的 payload 中的 WsRTCData，此时 WsData 中的 action 为 CustomMessage
+export interface WsRTCData {
+  totalLength?: number
+  action: WsRTCAction
+  userId: number
+  payload?: Uint8Array
+}
+
+export function buildWsRTCData(data: WsRTCData): ArrayBuffer {
+  const { action, userId, payload = new ArrayBuffer(0) } = data
+
+  const totalLength = 8 + payload.byteLength
+
+  const header = new ArrayBuffer(8)
+  const headerView = new DataView(header)
+  headerView.setUint16(0, totalLength)
+  headerView.setUint8(2, action)
+  headerView.setUint32(4, userId)
+
+  const buffer = new Uint8Array(totalLength)
+  buffer.set(new Uint8Array(header), 0)
+  buffer.set(new Uint8Array(payload), 8)
+
+  return buffer
+}
+
+export function parseWsRTCData(data: ArrayBuffer): WsRTCData {
+  const header = data.slice(0, 8)
+
+  const headerView = new DataView(header)
+  const totalLength = headerView.getUint16(0)
+  const action = headerView.getUint8(2)
+  const userId = headerView.getUint32(4)
+  const payload = new Uint8Array(data.slice(8, totalLength))
+
+  return {
+    totalLength,
+    action,
+    userId,
+    payload,
+  }
+}

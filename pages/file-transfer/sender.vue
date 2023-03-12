@@ -1,76 +1,48 @@
 <script setup lang="ts">
 import type { Fn, WebSocketStatus } from '@vueuse/core'
 
-const roomId = ref('')
+const roomId = ref('21')
 
-const senderId = ref(0)
-const roomUserIds = ref<number[]>([
-  12121212, 22121212,
-])
-
-let status = ref<WebSocketStatus>('CLOSED')
-let data = ref<any>()
-let sendWs: (data: string | ArrayBuffer | Blob, useBuffer?: boolean) => boolean
 let openWebsocket: Fn
+const wsStatus = ref<WebSocketStatus>('CLOSED')
+const rtcStatus = ref<RTCPeerConnectionState>('closed')
+const dataChannelStatus = ref<RTCDataChannelState>('closed')
+const roomUserIds = ref<number[]>([])
+const senderId = ref(0)
 
-onMounted(() => {
-  roomId.value = Array.from({ length: 6 }, () => Math.floor(Math.random() * 10)).join('');
+const fileList = ref<File[]>([])
 
-  ({ status, data, send: sendWs, open: openWebsocket } = useWebSocket('ws://localhost:1323/ws', {
-    immediate: false,
-    autoClose: true,
-    autoReconnect: true,
-    heartbeat: false,
+onMounted(async () => {
+  ({ openWebsocket } = await useWsRTC({
+    roomId,
+    role: 'sender',
+    roomUserIds,
+    senderId,
+    wsStatus,
+    rtcStatus,
+    dataChannelStatus,
   }))
 })
 
-const stopWatchWsStatus = watch(status, (oldStatus, newStatus) => {
-  console.log(oldStatus, newStatus)
-})
+function onFileChange(e: Event) {
+  const file = (e.target as HTMLInputElement).files
 
-const stopWatchData = watch(data, (val) => {
-  if (val instanceof ArrayBuffer || val instanceof Blob) {
-    console.log('receive binary data', val)
-    processWsData(val)
+  if (file) {
+    fileList.value = Object.values(file)
   }
-  else {
-    console.log('receive text data', val)
-  }
-})
 
-async function processWsData(data: ArrayBuffer | Blob) {
-  const d = await parseWsData(data)
-  switch (d.action) {
-    case WsAction.SendClientInfo: {
-      console.log('setup client')
-      senderId.value = d.sender
-
-      // 加入房间
-      sendWs(buildWsData({
-        action: WsAction.JoinRoom,
-        room: parseInt(roomId.value),
-        sender: senderId.value,
-      }))
-      break
-    }
-    case WsAction.SendRoomUserIds:{
-      console.log('setup room', d.room, d.payload)
-      const { users } = parseRoomInfo(d.payload as ArrayBuffer)
-      roomUserIds.value = users
-      break
-    }
-  }
+  // const reader = new FileReader()
+  // reader.onload = () => {
+  //   const data = reader.result as string
+  //   console.log(data)
+  // }
+  // reader.readAsDataURL(file)
 }
-
-onUnmounted(() => {
-  stopWatchData()
-  stopWatchWsStatus()
-})
 </script>
 
 <template>
   <transition name="fade">
-    <div v-if="status !== 'OPEN'" absolute-full bg-white hidden>
+    <div v-if="wsStatus !== 'OPEN'" absolute-full bg-white z-1 hidden>
       <div pt-30vh max-w-80vw mx-auto text-center>
         <h1>
           芝麻开门
@@ -78,7 +50,7 @@ onUnmounted(() => {
 
         <span>*输入序列，用于匹配发送者与接收者</span>
 
-        <serial-number v-model:value="roomId" :length="6" py-lg />
+        <serial-number v-model="roomId" :length="6" py-lg />
 
         <div
           w-4em h-4em lh-4em rounded="50%" text-center mx-auto text-white cursor-pointer
@@ -88,7 +60,7 @@ onUnmounted(() => {
             'bg-black/50': roomId.length !== 6,
           }"
         >
-          <loading-spinner v-if="status === 'CONNECTING'" />
+          <loading-spinner v-if="wsStatus === 'CONNECTING'" />
           <span v-else @click="openWebsocket">开启</span>
         </div>
       </div>
@@ -116,8 +88,18 @@ onUnmounted(() => {
       <hr>
 
       <div relative w-full mt-xl py-2 border="2px dashed black/60" rounded-xl>
-        <input type="file" absolute-full opacity-0 cursor-pointer>
+        <input type="file" absolute-full opacity-0 cursor-pointer @change="onFileChange">
         <Icon name="fluent:add-20-filled" w-6 h-6 text-black:60 />
+      </div>
+
+      <div py-xl>
+        <div v-for="file in fileList" :key="file.name" text-left p-xs bg-black:10 rounded-xl>
+          {{ file.name }}
+        </div>
+      </div>
+
+      <div w-30 h-10 lh-10 mx-auto mt-xl bg-blue:30 rounded-xl cursor-pointer shadow>
+        发送
       </div>
     </div>
   </div>
