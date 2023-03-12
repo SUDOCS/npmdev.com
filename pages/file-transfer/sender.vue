@@ -1,16 +1,27 @@
 <script setup lang="ts">
-const roomId = ref(Array.from({ length: 6 }, () => Math.floor(Math.random() * 10)).join(''))
+import type { Fn, WebSocketStatus } from '@vueuse/core'
+
+const roomId = ref('')
 
 const senderId = ref(0)
 const roomUserIds = ref<number[]>([
   12121212, 22121212,
 ])
 
-const { status, data, close, send, ws, open: openWebsocket } = useWebSocket('ws://localhost:1323/ws', {
-  immediate: false,
-  autoClose: true,
-  autoReconnect: true,
-  heartbeat: false,
+let status = ref<WebSocketStatus>('CLOSED')
+let data = ref<any>()
+let sendWs: (data: string | ArrayBuffer | Blob, useBuffer?: boolean) => boolean
+let openWebsocket: Fn
+
+onMounted(() => {
+  roomId.value = Array.from({ length: 6 }, () => Math.floor(Math.random() * 10)).join('');
+
+  ({ status, data, send: sendWs, open: openWebsocket } = useWebSocket('ws://localhost:1323/ws', {
+    immediate: false,
+    autoClose: true,
+    autoReconnect: true,
+    heartbeat: false,
+  }))
 })
 
 const stopWatchWsStatus = watch(status, (oldStatus, newStatus) => {
@@ -35,7 +46,7 @@ async function processWsData(data: ArrayBuffer | Blob) {
       senderId.value = d.sender
 
       // 加入房间
-      send(buildWsData({
+      sendWs(buildWsData({
         action: WsAction.JoinRoom,
         room: parseInt(roomId.value),
         sender: senderId.value,
