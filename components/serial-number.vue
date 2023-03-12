@@ -1,15 +1,23 @@
 <script setup lang="ts">
 const props = withDefaults(defineProps<{
-  value: string
+  modelValue: string
   length?: number
 }>(), {
-  value: '',
+  modelValue: '',
   length: 6,
 })
 
-const emits = defineEmits(['update:value'])
+const emits = defineEmits(['update:modelValue'])
 
-const text = ref(props.value)
+const text = computed({
+  get() {
+    return props.modelValue
+  },
+  set(val: string) {
+    emits('update:modelValue', val)
+  },
+})
+
 const active = ref(-1)
 const inputEl = ref<HTMLInputElement>()
 const isLargeScreen = useMediaQuery('(min-width: 1024px)')
@@ -35,21 +43,20 @@ function onInputChange(event: Event) {
   else {
     text.value = val
     active.value = val.length - 1
-    emits('update:value', val)
   }
 }
 
 onMounted(() => {
-  if (props.value.length > 0 && isLargeScreen.value) {
+  if (text.value.length > 0 && isLargeScreen.value) {
     (inputEl.value as HTMLInputElement).focus()
-    active.value = props.value.length - 1
+    active.value = text.value.length - 1
   }
 })
 </script>
 
 <template>
   <div relative text-20px @click="activeInput">
-    <input ref="inputEl" type="text" :value="props.value" class="serial-number-input" @input="onInputChange">
+    <input ref="inputEl" type="text" :value="props.modelValue" class="serial-number-input" @input="onInputChange">
     <div frow gap-1em flex-center flex-wrap>
       <div
         v-for="(_, idx) in length" :key="idx" class="serial-number-box"
