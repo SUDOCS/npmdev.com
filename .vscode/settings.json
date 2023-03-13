@@ -11,5 +11,7 @@
     "source.fixAll.eslint": true,
     "source.organizeImports": true
   },
-  "unocss.root": ["."]
+  "unocss.root": [
+    "."
+  ]
 }

@@ -1,4 +1,5 @@
 import type { WebSocketStatus } from '@vueuse/core'
+import { SliceFile } from './../utils/file'
 
 export interface UseWSRTCOptions {
   roomId: Ref<string>
@@ -8,56 +9,132 @@ export interface UseWSRTCOptions {
   wsStatus: Ref<WebSocketStatus>
   rtcStatus: Ref<RTCPeerConnectionState>
   dataChannelStatus: Ref<RTCDataChannelState>
+  onFileReceived?: (file: SliceFile) => void
 }
 
-export interface RTCDataChannelFileData {
-  totalLength?: number
-  // 标记传输一个文件
-  transimitId: number
-  sequence: number
-  hasMore: 0 | 1
+export enum RTCDataChannelDataType {
+  Message = 1,
+  FileSlice,
+}
+
+export interface RTCDataChannelData {
+  totalLength?: number // 2 bytes
+  type: RTCDataChannelDataType // 2 byte
   payload: ArrayBuffer
 }
 
-function buildRTCDataChannelFileData(data: RTCDataChannelFileData): ArrayBuffer {
-  const { transimitId, sequence, hasMore, payload } = data
+function encodeRTCDataChannelData(data: RTCDataChannelData): ArrayBuffer {
+  const { type, payload } = data
 
-  const totalLength = 12 + payload.byteLength
-
-  const header = new ArrayBuffer(12)
-  const headerView = new DataView(header)
-  headerView.setUint32(0, totalLength)
-  headerView.setUint32(2, transimitId)
-  headerView.setUint32(4, sequence)
-  headerView.setUint8(8, hasMore)
+  const totalLength = 4 + payload.byteLength
 
   const buffer = new ArrayBuffer(totalLength)
-  const view = new Uint8Array(buffer)
-  view.set(new Uint8Array(header), 0)
-  view.set(new Uint8Array(payload), 12)
+  const view = new DataView(buffer)
+
+  view.setUint16(0, totalLength)
+  view.setUint16(2, type)
+
+  const payloadView = new Uint8Array(buffer, 4)
+  payloadView.set(new Uint8Array(payload))
 
   return buffer
 }
 
-function parseRTCDataChannelFileData(data: ArrayBuffer): RTCDataChannelFileData {
+function decodeRTCDataChannelData(data: ArrayBuffer): RTCDataChannelData {
   const view = new DataView(data)
-  const totalLength = view.getUint32(0)
-  const transimitId = view.getUint32(2)
-  const sequence = view.getUint32(4)
-  const hasMore = view.getUint8(8) as (0 | 1)
-  const payload = new Uint8Array(data.slice(12, totalLength))
+
+  const totalLength = view.getUint16(0)
+  const type = view.getUint16(2) as RTCDataChannelDataType
+
+  const payload = data.slice(4)
 
   return {
     totalLength,
-    transimitId,
-    sequence,
+    type,
+    payload,
+  }
+}
+
+export interface RTCDataChannelFileSlice {
+  totalLength?: number // 2 bytes
+  // 标记传输一个文件
+  fileId: number // 1 bytes
+  hasMore: 0 | 1 // 1 byte
+
+  sliceSize: number // 4 bytes
+  fileSize: number // 4 bytes
+  sequence: number // 4 bytes
+
+  // offset: 16
+  fileNameLength?: number // 2 bytes
+  // offset: 18
+  fileName: string // 254 bytes
+
+  // offset: 272
+  payload: ArrayBuffer
+}
+
+function encodeRTCDataChannelFileSlice(data: RTCDataChannelFileSlice): ArrayBuffer {
+  const { fileId, sliceSize, fileSize, fileName, sequence, hasMore, payload } = data
+
+  const totalLength = 16 + 256 + payload.byteLength
+  const fileNameLength = fileName.length
+
+  const buffer = new ArrayBuffer(totalLength)
+  const view = new DataView(buffer)
+
+  view.setUint16(0, totalLength)
+  view.setUint8(2, fileId)
+  view.setUint8(3, hasMore)
+  view.setUint32(4, sliceSize)
+  view.setUint32(8, fileSize)
+  view.setUint32(12, sequence)
+  view.setUint16(16, fileNameLength)
+
+  const nameView = new Uint8Array(buffer, 18, 254)
+  nameView.set(new TextEncoder().encode(fileName))
+
+  const payloadView = new Uint8Array(buffer, 272)
+  payloadView.set(new Uint8Array(payload))
+
+  return buffer
+}
+
+function decodeRTCDataChannelFileSlice(data: ArrayBuffer): RTCDataChannelFileSlice {
+  const view = new DataView(data)
+
+  const totalLength = view.getUint16(0)
+  const fileId = view.getUint8(2)
+  const hasMore = view.getUint8(3) as 0 | 1
+  const sliceSize = view.getUint32(4)
+  const fileSize = view.getUint32(8)
+  const sequence = view.getUint32(12)
+  const fileNameLength = view.getUint16(16)
+
+  const fileName = new TextDecoder().decode(data.slice(18, 18 + fileNameLength))
+
+  const payload = data.slice(272)
+
+  return {
+    totalLength,
+    fileId,
     hasMore,
+    sliceSize,
+    fileSize,
+    sequence,
+    fileName,
     payload,
   }
 }
 
 export async function useWsRTC(options: UseWSRTCOptions) {
   const { wsStatus, rtcStatus, dataChannelStatus, roomId, role, roomUserIds, senderId } = options
+
+  const fileMap = new Map<number, {
+    file: SliceFile
+    // 不同文件需要有不同的回调函数，不然可能会应为节流而没有被调用，忽略掉小文件s
+    onReceived?: (file: SliceFile) => void
+  }>()
 
   let rtcConn: RTCPeerConnection
   let dataChannel: RTCDataChannel
@@ -109,7 +186,7 @@ export async function useWsRTC(options: UseWSRTCOptions) {
         const { users } = parseRoomInfo(d.payload as ArrayBuffer)
         roomUserIds.value = users
 
-        if (users.length > 1) {
+        if (users.length === 2) {
           startRtc()
         }
         break
@@ -215,6 +292,7 @@ export async function useWsRTC(options: UseWSRTCOptions) {
       console.log('sender create data channel')
 
       dataChannel = rtcConn.createDataChannel('file')
+      dataChannel.binaryType = 'arraybuffer'
       dataChannel.onopen = onDataChannelOpen
       dataChannel.onclose = onDataChannelClose
       dataChannel.onmessage = onDataChannelMessage
@@ -245,6 +323,37 @@ export async function useWsRTC(options: UseWSRTCOptions) {
 
   function onDataChannelMessage(e: MessageEvent) {
     console.log('data channel message', e)
+    const arr = new Uint8Array(e.data)
+
+    const data = decodeRTCDataChannelData(arr.buffer)
+
+    switch (data.type) {
+      case RTCDataChannelDataType.Message:{
+        break
+      }
+      case RTCDataChannelDataType.FileSlice:{
+        const fileData = decodeRTCDataChannelFileSlice(data.payload)
+        console.log('data channel file slice', fileData)
+
+        let fileWithHook = fileMap.get(fileData.fileId)
+
+        if (!fileWithHook) {
+          const file = new SliceFile(fileData.sliceSize, fileData.fileSize, fileData.fileName)
+          fileWithHook = {
+            file,
+            onReceived: options.onFileReceived !== undefined
+              ? useThrottleFn(options.onFileReceived, 200)
+              : undefined,
+          }
+          fileMap.set(fileData.fileId, fileWithHook)
+        }
+
+        fileWithHook.file.push(fileData.sequence, fileData.payload)
+
+        fileWithHook.onReceived && fileWithHook.onReceived(fileWithHook.file)
+        break
+      }
+    }
   }
 
   function onDataChannelClose(e: Event) {
@@ -272,17 +381,27 @@ export async function useWsRTC(options: UseWSRTCOptions) {
         // slice file
         const sliceSize = 16 * 1024 // 16KB
 
+        const fileId = Math.ceil(Math.random() * 1000000)
+
         let byteSent = 0
         let sequence = 0
         while (byteSent < buffer.byteLength) {
           const slice = buffer.slice(byteSent, byteSent + sliceSize)
 
-          dataChannel.send(buildRTCDataChannelFileData({
-            sequence,
-            transimitId: 1,
-            totalLength: buffer.byteLength,
-            payload: slice,
+          const filePayload = encodeRTCDataChannelFileSlice({
+            totalLength: slice.byteLength,
+            fileId,
             hasMore: byteSent + sliceSize < buffer.byteLength ? 1 : 0,
+            sliceSize,
+            fileSize: buffer.byteLength,
+            sequence,
+            fileName: file.name,
+            payload: slice,
+          })
+
+          dataChannel.send(encodeRTCDataChannelData({
+            type: RTCDataChannelDataType.FileSlice,
+            payload: filePayload,
           }))
 
           sequence++

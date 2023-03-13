@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Fn, WebSocketStatus } from '@vueuse/core'
+import type { SliceFile } from '~~/utils/file'
 
 let openWebsocket: Fn
 const roomId = ref('')
@@ -8,6 +9,8 @@ const rtcStatus = ref<RTCPeerConnectionState>('closed')
 const dataChannelStatus = ref<RTCDataChannelState>('closed')
 const roomUserIds = ref<number[]>([])
 const senderId = ref(0)
+
+const fileList = ref<SliceFile[]>([])
 
 onMounted(async () => {
   ({ openWebsocket } = await useWsRTC({
@@ -18,8 +21,37 @@ onMounted(async () => {
     wsStatus,
     rtcStatus,
     dataChannelStatus,
+    onFileReceived,
   }))
 })
+
+function onFileReceived(file: SliceFile) {
+  console.log('on file received', file)
+
+  if (fileList.value.some(f => f.name === file.name)) {
+    fileList.value = fileList.value.map(f => f.name === file.name ? file : f)
+  }
+  else {
+    fileList.value = [...fileList.value, file]
+  }
+}
+
+function downloadFile(file: SliceFile) {
+  const link = document.createElement('a')
+  link.href = window.URL.createObjectURL(file.Blob)
+  link.download = file.name
+
+  link.dispatchEvent(new MouseEvent('click', {
+    bubbles: true,
+    cancelable: true,
+    view: window,
+  }))
+
+  setTimeout(() => {
+    window.URL.revokeObjectURL(link.href)
+    link.remove()
+  })
+}
 </script>
 
 <template>
@@ -70,6 +102,20 @@ onMounted(async () => {
       </div>
 
       <hr>
+
+      <div py-xl>
+        <div v-for="file in fileList" :key="file.name" text-left p-xs bg-black:10 rounded-xl frow justify-between>
+          <span>
+            {{ file.name }}
+          </span>
+
+          <button p-1 outline-none border-none bg-transparent cursor-pointer hover:bg-black:10 rounded="1/2">
+            <Icon
+              name="fluent:arrow-download-24-regular" text-5 lh-5 scoped @click="downloadFile(file)"
+            />
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { Fn, WebSocketStatus } from '@vueuse/core'
 
-const roomId = ref('21')
+const roomId = ref('')
 
 let openWebsocket: Fn
+let sendFileWithRTC: (file: File) => void
 const wsStatus = ref<WebSocketStatus>('CLOSED')
 const rtcStatus = ref<RTCPeerConnectionState>('closed')
 const dataChannelStatus = ref<RTCDataChannelState>('closed')
@@ -13,7 +14,7 @@ const senderId = ref(0)
 const fileList = ref<File[]>([])
 
 onMounted(async () => {
-  ({ openWebsocket } = await useWsRTC({
+  ({ openWebsocket, sendFileWithRTC } = await useWsRTC({
     roomId,
     role: 'sender',
     roomUserIds,
@@ -25,24 +26,24 @@ onMounted(async () => {
 })
 
 function onFileChange(e: Event) {
-  const file = (e.target as HTMLInputElement).files
+  const files = (e.target as HTMLInputElement).files
 
-  if (file) {
-    fileList.value = Object.values(file)
+  console.log(files)
+
+  if (files) {
+    fileList.value = Object.values(files)
+
+    if (fileList.value.length > 0) {
+      const file = fileList.value[0]
+      sendFileWithRTC(file)
+    }
   }
-
-  // const reader = new FileReader()
-  // reader.onload = () => {
-  //   const data = reader.result as string
-  //   console.log(data)
-  // }
-  // reader.readAsDataURL(file)
 }
 </script>
 
 <template>
   <transition name="fade">
-    <div v-if="wsStatus !== 'OPEN'" absolute-full bg-white z-1 hidden>
+    <div v-if="wsStatus !== 'OPEN'" absolute-full bg-white z-1>
       <div pt-30vh max-w-80vw mx-auto text-center>
         <h1>
           芝麻开门
@@ -97,10 +98,10 @@ function onFileChange(e: Event) {
           {{ file.name }}
         </div>
       </div>
-
+      <!--
       <div w-30 h-10 lh-10 mx-auto mt-xl bg-blue:30 rounded-xl cursor-pointer shadow>
         发送
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
