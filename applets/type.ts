@@ -7,6 +7,8 @@ export interface AppletConfig {
   title: string
   /* 图标 */
   icon: string
+  /* 允许在新标签页打开 */
+  enableOpenInNewTab?: boolean
   /* 允许最小化 */
   enableMinimize?: boolean
   /* 允许最大化 */
@@ -34,6 +36,7 @@ export interface AppletConfig {
 }
 
 export const defaultAppleatConfig: Partial<AppletConfig> = {
+  enableOpenInNewTab: true,
   enableMinimize: true,
   enableMaximize: true,
   customTitleBar: false,

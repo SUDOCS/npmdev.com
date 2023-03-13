@@ -211,6 +211,10 @@ function onIframeLoad() {
     iframeLoaded.value = true
   }, 300)
 }
+
+function openNewTab() {
+  window.open(props.config.route, '_blank')
+}
 </script>
 
 <template>
@@ -238,6 +242,10 @@ function onIframeLoad() {
       <div flex-1 h-full cursor-move @mousedown.stop="mouseDown" />
       <!-- 按钮 -->
       <div frow>
+        <!-- 新标签页打开 -->
+        <div v-if="config.enableOpenInNewTab && config.route" title="新标签页打开" class="window-btn" @click="openNewTab">
+          <Icon name="fluent:tab-desktop-new-page-20-regular" />
+        </div>
         <!-- 最小化 -->
         <div v-if="config.enableMinimize" title="最小化" class="window-btn" @click="doWindowAction(WindowAction.Minimize)">
           <Icon name="fluent:minimize-24-regular" />
