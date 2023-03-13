@@ -1,5 +1,5 @@
 import Album from './album'
-import Blog from './blog'
+import Posts from './posts'
 import Computer from './computer'
 import Explorer from './explorer'
 import P2PFileTransfer from './file-transfer'
@@ -14,7 +14,7 @@ const AllApps = [
   Computer,
   Explorer,
   Github,
-  Blog,
+  Posts,
   Music,
   Album,
   Resume,

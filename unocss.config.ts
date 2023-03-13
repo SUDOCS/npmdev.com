@@ -5,6 +5,11 @@ import { presetAttributify, presetIcons, presetUno } from 'unocss'
 import { defineConfig } from 'unocss/vite'
 
 export default defineConfig({
+  theme: {
+    colors: {
+      textShadowColor: '#1C1F21',
+    },
+  },
   presets: [
     presetUno(),
     presetAttributify(),

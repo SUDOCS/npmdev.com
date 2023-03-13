@@ -1,7 +1,8 @@
 import { defineAppletConfig } from './type'
 
 export default defineAppletConfig({
-  name: 'blog',
-  title: 'Blog',
+  name: 'posts',
+  title: 'Posts',
   icon: 'reader',
+  route: '/posts',
 })
