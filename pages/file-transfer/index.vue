@@ -4,7 +4,7 @@ import uploadIllustration from '@/assets/illustrations/upload.svg?inline'
 </script>
 
 <template>
-  <div w-100vw h-100vh flex-center flex-wrap gap-20 p-10>
+  <div h-100vh flex-center flex-wrap gap-20 p-10>
     <NuxtLink to="/file-transfer/sender" class="entrance">
       <img :src="uploadIllustration" alt="">
       <span>发送</span>
@@ -27,7 +27,7 @@ import uploadIllustration from '@/assets/illustrations/upload.svg?inline'
 }
 
 .entrance{
-  @apply relative w-16em h-16em flex-center flex-col gap-xl border border-solid border-black:10 rounded-xl transition;
+  @apply relative w-12em h-12em lg:(w-16em h-16em) flex-center flex-col gap-xl border border-solid border-black:10 rounded-xl transition;
   overflow: hidden;
 
   &:hover{
