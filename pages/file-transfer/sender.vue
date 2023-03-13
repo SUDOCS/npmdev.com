@@ -4,7 +4,7 @@ import type { Fn, WebSocketStatus } from '@vueuse/core'
 const roomId = ref('')
 
 let openWebsocket: Fn
-let sendFileWithRTC: (file: File) => void
+let sendFileWithRTC: (file: File, onPercentage?: (name: string, percentage: number) => void) => void
 const wsStatus = ref<WebSocketStatus>('CLOSED')
 const rtcStatus = ref<RTCPeerConnectionState>('closed')
 const dataChannelStatus = ref<RTCDataChannelState>('closed')
@@ -12,6 +12,7 @@ const roomUserIds = ref<number[]>([])
 const senderId = ref(0)
 
 const fileList = ref<File[]>([])
+const percentages = ref<Record<string, number>>({})
 
 onMounted(async () => {
   ({ openWebsocket, sendFileWithRTC } = await useWsRTC({
@@ -26,18 +27,22 @@ onMounted(async () => {
 })
 
 function onFileChange(e: Event) {
-  const files = (e.target as HTMLInputElement).files
+  const fl = (e.target as HTMLInputElement).files
+  if (fl && Object.values(fl).length > 0) {
+    const file = Object.values(fl)[0]
+    sendFileWithRTC(file, onPercentage)
 
-  console.log(files)
-
-  if (files) {
-    fileList.value = Object.values(files)
-
-    if (fileList.value.length > 0) {
-      const file = fileList.value[0]
-      sendFileWithRTC(file)
+    if (!fileList.value.some(f => f.name === file.name)) {
+      // 新文件
+      percentages.value = { ...percentages.value, [file.name]: 0 }
+      fileList.value = [...fileList.value, file]
     }
   }
+}
+
+function onPercentage(name: string, percentage: number) {
+  console.log(name, percentage)
+  percentages.value = { ...percentages.value, [name]: percentage }
 }
 </script>
 
@@ -93,9 +98,16 @@ function onFileChange(e: Event) {
         <Icon name="fluent:add-20-filled" w-6 h-6 text-black:60 />
       </div>
 
-      <div py-xl>
-        <div v-for="file in fileList" :key="file.name" text-left p-xs bg-black:10 rounded-xl>
-          {{ file.name }}
+      <div py-xl fcol gap-xs items-stretch>
+        <div v-for="file in fileList" :key="file.name" text-left p-xs bg-black:10 rounded-xl frow justify-between relative overflow-hidden>
+          <!-- percentage -->
+          <div :style="{ width: `${percentages[file.name]}%` }" absolute left-0 top-0 bottom-0 bg-blue:40 transition="width" pointer-events-none />
+          <span>
+            {{ file.name }}
+          </span>
+          <span>
+            {{ percentages[file.name].toFixed(2) }}%
+          </span>
         </div>
       </div>
       <!--

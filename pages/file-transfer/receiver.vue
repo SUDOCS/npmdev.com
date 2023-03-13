@@ -81,8 +81,6 @@ function downloadFile(file: SliceFile) {
     </div>
   </transition>
 
-  <hr>
-
   <div>
     <div w-80vw mx-auto text-center>
       <div pt-xl>
@@ -103,13 +101,18 @@ function downloadFile(file: SliceFile) {
 
       <hr>
 
-      <div py-xl>
-        <div v-for="file in fileList" :key="file.name" text-left p-xs bg-black:10 rounded-xl frow justify-between>
+      <div py-xl fcol gap-xs items-stretch>
+        <div v-for="file in fileList" :key="file.name" text-left p-xs bg-black:10 rounded-xl frow justify-between relative overflow-hidden>
+          <!-- percentage -->
+          <div :style="{ width: `${file.percentage}%` }" absolute left-0 top-0 bottom-0 bg-blue:40 transition="width" pointer-events-none />
           <span>
             {{ file.name }}
           </span>
 
-          <button p-1 outline-none border-none bg-transparent cursor-pointer hover:bg-black:10 rounded="1/2">
+          <span v-if="!file.complete">
+            {{ file.percentage.toFixed(2) }}%
+          </span>
+          <button v-else p-1 outline-none border-none bg-transparent cursor-pointer hover:bg-black:10 rounded="1/2">
             <Icon
               name="fluent:arrow-download-24-regular" text-5 lh-5 scoped @click="downloadFile(file)"
             />

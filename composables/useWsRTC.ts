@@ -78,7 +78,8 @@ function encodeRTCDataChannelFileSlice(data: RTCDataChannelFileSlice): ArrayBuff
   const { fileId, sliceSize, fileSize, fileName, sequence, hasMore, payload } = data
 
   const totalLength = 16 + 256 + payload.byteLength
-  const fileNameLength = fileName.length
+  const nameBuffer = new TextEncoder().encode(fileName)
+  const fileNameLength = nameBuffer.byteLength
 
   const buffer = new ArrayBuffer(totalLength)
   const view = new DataView(buffer)
@@ -92,7 +93,7 @@ function encodeRTCDataChannelFileSlice(data: RTCDataChannelFileSlice): ArrayBuff
   view.setUint16(16, fileNameLength)
 
   const nameView = new Uint8Array(buffer, 18, 254)
-  nameView.set(new TextEncoder().encode(fileName))
+  nameView.set(nameBuffer)
 
   const payloadView = new Uint8Array(buffer, 272)
   payloadView.set(new Uint8Array(payload))
@@ -122,6 +123,7 @@ function decodeRTCDataChannelFileSlice(data: ArrayBuffer): RTCDataChannelFileSli
     sliceSize,
     fileSize,
     sequence,
+    fileNameLength,
     fileName,
     payload,
   }
@@ -342,7 +344,7 @@ export async function useWsRTC(options: UseWSRTCOptions) {
           fileWithHook = {
             file,
             onReceived: options.onFileReceived !== undefined
-              ? useThrottleFn(options.onFileReceived, 200)
+              ? useThrottleFn(options.onFileReceived, 100)
               : undefined,
           }
           fileMap.set(fileData.fileId, fileWithHook)
@@ -351,6 +353,11 @@ export async function useWsRTC(options: UseWSRTCOptions) {
         fileWithHook.file.push(fileData.sequence, fileData.payload)
 
         fileWithHook.onReceived && fileWithHook.onReceived(fileWithHook.file)
+
+        // 最后一个一定要报告一下
+        if (!fileData.hasMore) {
+          options.onFileReceived && options.onFileReceived(fileWithHook.file)
+        }
         break
       }
     }
@@ -370,33 +377,35 @@ export async function useWsRTC(options: UseWSRTCOptions) {
     dataChannelStatus.value = 'closing'
   }
 
-  function sendFileWithRTC(file: File) {
+  function sendFileWithRTC(file: File, onPercentage?: (name: string, percentage: number) => void) {
     if (dataChannelStatus.value !== 'open') {
       console.log('data channel not open')
       return
     }
 
-    file.arrayBuffer()
-      .then((buffer) => {
-        // slice file
-        const sliceSize = 16 * 1024 // 16KB
+    SliceFile.fromFile(file).then((sliceFile) => {
+      const fileId = Math.ceil(Math.random() * 1000000)
 
-        const fileId = Math.ceil(Math.random() * 1000000)
+      let sliceSent = 0
 
-        let byteSent = 0
-        let sequence = 0
-        while (byteSent < buffer.byteLength) {
-          const slice = buffer.slice(byteSent, byteSent + sliceSize)
+      const send = () => {
+        while (sliceSent < sliceFile.sliceCount) {
+          if (dataChannel.bufferedAmount > dataChannel.bufferedAmountLowThreshold) {
+            dataChannel.onbufferedamountlow = () => {
+              dataChannel.onbufferedamountlow = null
+              send()
+            }
+            return
+          }
 
           const filePayload = encodeRTCDataChannelFileSlice({
-            totalLength: slice.byteLength,
             fileId,
-            hasMore: byteSent + sliceSize < buffer.byteLength ? 1 : 0,
-            sliceSize,
-            fileSize: buffer.byteLength,
-            sequence,
+            hasMore: sliceSent < sliceFile.sliceCount - 1 ? 1 : 0,
+            sliceSize: sliceFile.sliceSize,
+            fileSize: sliceFile.fileSize,
+            sequence: sliceSent,
             fileName: file.name,
-            payload: slice,
+            payload: sliceFile.at(sliceSent),
           })
 
           dataChannel.send(encodeRTCDataChannelData({
@@ -404,10 +413,14 @@ export async function useWsRTC(options: UseWSRTCOptions) {
             payload: filePayload,
           }))
 
-          sequence++
-          byteSent += sliceSize
+          sliceSent++
+
+          onPercentage && onPercentage(file.name, (sliceSent / sliceFile.sliceCount * 100))
         }
-      })
+      }
+
+      send()
+    })
   }
 
   onUnmounted(() => {
