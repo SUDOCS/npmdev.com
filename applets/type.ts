@@ -31,6 +31,10 @@ export interface AppletConfig {
 
   /* 应用打开的路由 */
   route?: string
+
+  /* 替换桌面，打开这个Applet对应的页面 */
+  replaceDesktopDirectly?: boolean
+
   /* 应用的桌面组件，统一为组件中包含窗口，窗口中打开frame */
   desktopComponent?: Component
 }
@@ -43,6 +47,7 @@ export const defaultAppleatConfig: Partial<AppletConfig> = {
   dockArea: 'center',
   showInDesktop: true,
   showInDock: true,
+  replaceDesktopDirectly: false,
 }
 
 // as inline 会在资源导入时加上?inline，然后通过vite插件将svg内联

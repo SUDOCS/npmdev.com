@@ -99,6 +99,5 @@ export default defineNuxtConfig({
   css: [
     '@/assets/common.scss',
   ],
-  // ssr: process.env.NODE_ENV === 'production',
   ssr: true,
 })

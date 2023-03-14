@@ -5,4 +5,5 @@ export default defineAppletConfig({
   title: 'Posts',
   icon: 'reader',
   route: '/posts',
+  replaceDesktopDirectly: true,
 })
