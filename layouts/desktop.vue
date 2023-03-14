@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { desktopApps } from '@/applets'
 import loadingIllustration from '@/assets/illustrations/loading.svg?inline'
+import Preference from '~~/utils/preference'
 
 const appletStore = useAppletStore()
 const { mountedApps } = storeToRefs(appletStore)
@@ -77,8 +78,13 @@ function onDesktopClick(e: MouseEvent) {
 
 onMounted(() => {
   loadBackground()
-  if (isLargeScreen.value) {
+
+  const HasShownComputerKey = 'has-shown-computer'
+
+  if (isLargeScreen.value && !Preference.get(HasShownComputerKey)) {
     appletStore.mountApp('computer')
+    // 一小时内不再显示
+    Preference.set(HasShownComputerKey, true, 60 * 60)
   }
 })
 </script>
