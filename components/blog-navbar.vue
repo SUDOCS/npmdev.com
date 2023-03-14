@@ -74,56 +74,56 @@ const { show, shadow } = toRefs(props)
 $height: 48px;
 
 @keyframes blog-navbar-in {
-    0% {
-        top: -$height;
-    }
-    100% {
-        top: 30px;
-    }
+  0% {
+      top: -$height;
+  }
+  100% {
+      top: 30px;
+  }
 }
 
 .blog-navbar {
-    @apply fixed top-30px left-0 right-0 m-auto frow justify-between
-    h-48px transition-all duration-500ms
-    transition-ease-out text-1rem py-12px rounded-1/2 shadow-none
-    animate-[blog-navbar-in_ease-out_0.5s] text-white
-    text-shadow-[0_0_3px_#1C1F21]
-    w-80% md:w-720px lg:w-960px xl:w-1200px;
+  @apply fixed top-30px left-0 right-0 m-auto frow justify-between
+  h-48px transition-all duration-500ms
+  transition-ease-out text-1rem py-12px rounded-1/2 shadow-none
+  animate-[blog-navbar-in_ease-out_0.5s] text-white
+  text-shadow-[0_0_3px_#1C1F21]
+  w-80% md:w-720px lg:w-960px xl:w-1200px;
 
-    &::before {
-        @apply absolute-full content-none z--1 rounded-48px
-        backdrop-blur-4px bg-#c2e9fb66;
-    }
+  &::before {
+      @apply absolute-full content-none z--1 rounded-48px
+      backdrop-blur-4px bg-#c2e9fb66;
+  }
 
-    &-hidden {
-        top: -$height;
-    }
+  &-hidden {
+      top: -$height;
+  }
 
-    &-shadow {
-        .navbar-content {
-            box-shadow: 0 0 10px rgb(0, 0, 0, 0.07) !important;
-        }
-    }
+  &-shadow {
+      .navbar-content {
+          box-shadow: 0 0 10px rgb(0, 0, 0, 0.07) !important;
+      }
+  }
 
-    .navbar-detail,
-    .navbar-brief {
-        @apply w-full h-full frow justify-between;
-    }
+  .navbar-detail,
+  .navbar-brief {
+      @apply w-full h-full frow justify-between;
+  }
 
-    .navbar-detail{
-        @apply hidden md:flex;
-    }
+  .navbar-detail{
+      @apply hidden md:flex;
+  }
 
-    .navbar-brief{
-        @apply flex md:hidden;
-    }
+  .navbar-brief{
+      @apply flex md:hidden;
+  }
 
-    .nav-list {
-        @apply h-full flex-center font-bold;
+  .nav-list {
+      @apply h-full flex-center font-bold;
 
-        .nav-item {
-            @apply inline px-12px cursor-pointer;
-        }
-    }
+      .nav-item {
+          @apply inline px-12px cursor-pointer;
+      }
+  }
 }
 </style>

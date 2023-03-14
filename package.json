@@ -19,7 +19,7 @@
     "@commitlint/config-conventional": "^17.4.4",
     "@nuxt/devtools": "^0.2.5",
     "@pinia/nuxt": "^0.4.7",
-    "@types/node": "^18.15.1",
+    "@types/node": "^18.15.2",
     "@unocss/nuxt": "^0.50.4",
     "@unocss/preset-web-fonts": "^0.50.4",
     "@unocss/transformer-directives": "^0.50.4",

@@ -18,7 +18,7 @@ const wallpaper = ref(wallpapers[Math.floor(Math.random() * wallpapers.length)])
 </template>
 
 <style scoped lang="scss">
-  @keyframes fadeInUp {
+@keyframes fadeInUp {
   0% {
     transform: translateY(50%);
     opacity: 0;
@@ -29,12 +29,12 @@ const wallpaper = ref(wallpapers[Math.floor(Math.random() * wallpapers.length)])
   }
 }
 .blog-header {
-    @apply h-20rem md:h-25rem w-full bg-center bg-no-repeat flex-center text-white
-    transition-all duration-300ms transition-ease-out;
+  @apply h-20rem md:h-25rem w-full bg-center bg-no-repeat flex-center text-white
+  transition-all duration-300ms transition-ease-out;
 
-    .title-box {
-      text-shadow: 0 0 4px #1c1f21;
-      animation: fadeInUp ease-out .5s;
-    }
+  .title-box {
+    text-shadow: 0 0 4px #1c1f21;
+    animation: fadeInUp ease-out .5s;
   }
+}
 </style>

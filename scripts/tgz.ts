@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path, { resolve } from 'path'
+import fs from 'node:fs'
+import path, { resolve } from 'node:path'
 import compressing from 'compressing'
 
 path.join = path.posix.join
