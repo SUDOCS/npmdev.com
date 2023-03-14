@@ -22,12 +22,12 @@ const padding = 4
 const menuWidth = 240 + padding * 2
 const menuHeight = padding + (36 + padding) * menus.value.length
 
-watchEffect(() => {
+watch(position, (pos) => {
   const whVar = {
     '--height': `${menuHeight}px`,
     '--width': `${menuWidth}px`,
   }
-  const { clientX, clientY } = position.value
+  const { clientX, clientY } = pos
   let top, left, right, bottom
   if (clientX + menuWidth > document.body.clientWidth) {
     right = `${document.body.clientWidth - clientX - padding}px`
