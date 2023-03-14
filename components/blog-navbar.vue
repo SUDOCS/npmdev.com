@@ -14,37 +14,44 @@ const props = defineProps({
 
 const { show, shadow } = toRefs(props)
 // show.value = true
+
+// 是否显示跳转到桌面的按钮，如果在desktop-windown中，就不显示
+const showNavToDesktop = ref(false)
+
+onMounted(() => {
+  showNavToDesktop.value = window.parent.location.pathname !== '/'
+})
 </script>
 
 <template>
   <nav
-    class="blog-navbar blog-navbar-expand"
-    :class="{ 'blog-navbar-hidden': !show, 'blog-navbar-shadow': shadow }"
+    class="posts-navbar posts-navbar-expand"
+    :class="{ 'posts-navbar-hidden': !show, 'posts-navbar-shadow': shadow }"
   >
     <div class="navbar-detail">
       <ul class="nav-list">
         <li class="nav-item">
-          <nuxt-link to="/blog" class="navbar-brand">
+          <nuxt-link to="/posts" class="navbar-brand">
             🏠首页
           </nuxt-link>
         </li>
-        <li class="nav-item">
+        <li v-if="showNavToDesktop" class="nav-item">
           <router-link to="/">
             🖥️桌面
           </router-link>
         </li>
         <li class="nav-item">
-          <router-link to="/blog/achieve">
+          <router-link to="/posts/achieve">
             📂归档
           </router-link>
         </li>
         <li class="nav-item">
-          <router-link to="/blog/categories">
+          <router-link to="/posts/categories">
             📓分类
           </router-link>
         </li>
         <li class="nav-item">
-          <router-link to="/blog/about">
+          <router-link to="/posts/about">
             👒关于
           </router-link>
         </li>
@@ -73,7 +80,7 @@ const { show, shadow } = toRefs(props)
 <style scoped lang="scss">
 $height: 48px;
 
-@keyframes blog-navbar-in {
+@keyframes posts-navbar-in {
   0% {
       top: -$height;
   }
@@ -82,11 +89,11 @@ $height: 48px;
   }
 }
 
-.blog-navbar {
+.posts-navbar {
   @apply fixed top-30px left-0 right-0 m-auto frow justify-between
   h-48px transition-all duration-500ms
   transition-ease-out text-1rem py-12px rounded-1/2 shadow-none
-  animate-[blog-navbar-in_ease-out_0.5s] text-white
+  animate-[posts-navbar-in_ease-out_0.5s] text-white
   text-shadow-[0_0_3px_#1C1F21]
   w-80% md:w-720px lg:w-960px xl:w-1200px;
 
