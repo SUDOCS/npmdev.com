@@ -1,5 +1,5 @@
 import type { WebSocketStatus } from '@vueuse/core'
-import { SliceFile } from './../utils/file'
+import { SliceFile } from '../utils/file'
 
 export interface UseWSRTCOptions {
   roomId: Ref<string>
