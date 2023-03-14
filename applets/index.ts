@@ -4,6 +4,7 @@ import Explorer from './explorer'
 import P2PFileTransfer from './file-transfer'
 import Github from './github'
 import Launcher from './launcher'
+import Live from './live'
 import Music from './music'
 import Posts from './posts'
 import Resume from './resume'
@@ -19,6 +20,7 @@ const AllApps = [
   Album,
   Resume,
   P2PFileTransfer,
+  Live,
   Launcher,
   Settings,
   TrashBin,

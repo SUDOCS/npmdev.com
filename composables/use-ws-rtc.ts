@@ -146,8 +146,6 @@ export async function useWsRTC(options: UseWSRTCOptions) {
     roomId.value = Array.from({ length: 6 }, () => Math.floor(Math.random() * 10)).join('')
   }
 
-  console.log(import.meta.env.VITE_WS_UTL)
-
   const { status: WsStatus, data, send: sendWs, open: openWebsocket } = useWebSocket(import.meta.env.VITE_WS_URL, {
     immediate: false,
     autoClose: true,
