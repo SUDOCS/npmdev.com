@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import buildInfo from 'virtual:build-info'
-import wallpapers from 'virtual:wallpaper-auto-scanner'
 
 useHead({
   title: 'Computer Applet',
@@ -18,6 +17,9 @@ const favicons = {
   sass: 'https://sass-lang.com/assets/img/logos/logo-b6e1ef6e.svg',
   eslint: 'https://eslint.org/apple-touch-icon.png',
 }
+
+const wallpaperStore = useWallpaper()
+const { randomWallpaper } = storeToRefs(wallpaperStore)
 </script>
 
 <template>
@@ -25,7 +27,7 @@ const favicons = {
     <img
       absolute z--1
       w-full h-full object-cover
-      :src="wallpapers[Math.ceil(Math.random() * wallpapers.length) - 1]"
+      :src="randomWallpaper"
     >
 
     <h1 text-2xl text-white text-shadow-xl>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import wallpapers from 'virtual:wallpaper-auto-scanner'
 import { desktopApps } from '@/applets'
 import loadingIllustration from '@/assets/illustrations/loading.svg?inline'
 
@@ -22,20 +21,59 @@ useHead({
 
 const bgLoaded = ref(false)
 const bgSrc = ref('')
+const wallpaperStore = useWallpaper()
+const { currentWallpaper } = storeToRefs(wallpaperStore)
+
+watch(currentWallpaper, () => {
+  bgLoaded.value = false
+  loadBackground()
+})
+
+const isLargeScreen = useMediaQuery('(min-width: 1024px)')
+const contextMenuPosition = ref({ clientX: 0, clientY: 0 })
+const showContextMenu = ref(false)
+
+const menus = [
+  {
+    text: '🔄 刷新',
+    func: () => {
+      location.reload()
+    },
+  },
+  {
+    text: '🖼️ 切换壁纸',
+    func: () => {
+      wallpaperStore.nextWallpaper()
+    },
+  },
+]
 
 function loadBackground() {
   const img = new Image()
-  const bg = wallpapers[6]
+  const bg = currentWallpaper.value
+
+  bgSrc.value = bg
 
   img.onload = () => {
     bgLoaded.value = true
-    bgSrc.value = bg
   }
 
   img.src = bg
 }
 
-const isLargeScreen = useMediaQuery('(min-width: 1024px)')
+function onRightClick(e: MouseEvent) {
+  e.preventDefault()
+  contextMenuPosition.value = {
+    clientX: e.clientX,
+    clientY: e.clientY,
+  }
+  showContextMenu.value = true
+}
+
+function onDesktopClick(e: MouseEvent) {
+  e.preventDefault()
+  showContextMenu.value = false
+}
 
 onMounted(() => {
   loadBackground()
@@ -46,7 +84,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-show="bgLoaded" key="desktop" w-100vw h-100vh relative overflow-hidden>
+  <div
+    key="desktop" w-100vw h-100vh relative overflow-hidden
+    @click="onDesktopClick"
+    @contextmenu="onRightClick"
+  >
     <DesktopGrid />
     <DesktopDock />
 
@@ -67,6 +109,8 @@ onMounted(() => {
       <img :src="loadingIllustration" alt="" w-240px h-240px class="animate-[bgloading_1.5s_ease-in-out_infinite]">
     </div>
   </Transition>
+
+  <ContextMenu v-model:show="showContextMenu" :position="contextMenuPosition" :menus="menus" />
 </template>
 
 <style lang="scss">
