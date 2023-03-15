@@ -6,8 +6,8 @@ export enum WsAction {
   FetchRoomInfo,
 
   // server -> client
-  SendClientInfo = 128,
-  SendRoomUserIds,
+  NotifyClientInfo = 128,
+  AnnounceRoomUserIds,
 }
 
 export enum WsPayloadType {
@@ -19,6 +19,7 @@ export enum WsPayloadType {
 }
 
 export interface WsData {
+  totalLength?: number
   action: WsAction
   // payload 的数据为哪个应用服务，根据这个寻找对应的解析方法
   payloadType?: WsPayloadType
@@ -66,6 +67,7 @@ export async function decodeWsData(data: ArrayBuffer | Blob): Promise<WsData> {
   console.log('payload', payload)
 
   return {
+    totalLength,
     action,
     payloadType,
     room,

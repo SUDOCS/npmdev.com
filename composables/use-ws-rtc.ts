@@ -38,7 +38,23 @@ export async function useWsRTC(options: UseWSRTCOptions) {
 
   const stopWatchWsStatus = watch(WsStatus, (newStatus, oldStatus) => {
     console.log('ws status', oldStatus, newStatus)
+
+    switch (newStatus) {
+      case 'OPEN': {
+        roomUserIds.value = []
+        break
+      }
+      case 'CLOSED': {
+        roomUserIds.value = []
+        break
+      }
+    }
+
     wsStatus.value = newStatus
+  })
+
+  const stopWatchRTCStatus = watch(rtcStatus, (newStatus, oldStatus) => {
+    console.log('rtc status', oldStatus, newStatus)
   })
 
   const stopWatchData = watch(data, (val) => {
@@ -54,7 +70,7 @@ export async function useWsRTC(options: UseWSRTCOptions) {
   async function processWsData(data: ArrayBuffer | Blob) {
     const d = await decodeWsData(data)
     switch (d.action) {
-      case WsAction.SendClientInfo: {
+      case WsAction.NotifyClientInfo: {
         console.log('setup client')
         senderId.value = d.sender
 
@@ -66,17 +82,13 @@ export async function useWsRTC(options: UseWSRTCOptions) {
         }))
         break
       }
-      case WsAction.SendRoomUserIds:{
+      case WsAction.AnnounceRoomUserIds: {
         console.log('setup room', d.room, d.payload)
         const { users } = decodeRoomInfo(d.payload as ArrayBuffer)
         roomUserIds.value = users
-
-        if (users.length === 2) {
-          startRtc()
-        }
         break
       }
-      case WsAction.ApplicationMessage:{
+      case WsAction.ApplicationMessage: {
         console.log(senderId.value, 'receive custom message from', d.sender, d.payload)
 
         // 发送者是自己的话，不处理
@@ -84,7 +96,13 @@ export async function useWsRTC(options: UseWSRTCOptions) {
           break
 
         switch (d.payloadType) {
-          case WsPayloadType.WebRTC:{
+          case WsPayloadType.WebRTC: {
+            if (!rtcConn
+              || rtcConn.connectionState === 'disconnected'
+              || rtcConn.connectionState === 'failed') { // 接收者被动启动 WebRTC
+              startWebRTC()
+            }
+
             processWsWebRTCData(d.payload as ArrayBuffer)
             break
           }
@@ -99,7 +117,7 @@ export async function useWsRTC(options: UseWSRTCOptions) {
     const { action, userId, payload } = decodeWsRTCData(data)
 
     switch (action) {
-      case WsRTCAction.Offer:{
+      case WsRTCAction.Offer: {
         const offer = JSON.parse(new TextDecoder().decode(payload))
         console.log('receive offer from', userId, payload, offer)
         await rtcConn.setRemoteDescription(offer)
@@ -119,13 +137,13 @@ export async function useWsRTC(options: UseWSRTCOptions) {
         }))
         break
       }
-      case WsRTCAction.Answer:{
+      case WsRTCAction.Answer: {
         const answer = JSON.parse(new TextDecoder().decode(payload))
         console.log('receive answer from', userId, payload, answer)
         await rtcConn.setRemoteDescription(answer)
         break
       }
-      case WsRTCAction.IceCandidate:{
+      case WsRTCAction.IceCandidate: {
         const iceCandidate = JSON.parse(new TextDecoder().decode(payload))
         console.log('receive ice candidate from', userId, payload, iceCandidate)
         await rtcConn.addIceCandidate(iceCandidate)
@@ -134,7 +152,7 @@ export async function useWsRTC(options: UseWSRTCOptions) {
     }
   }
 
-  function startRtc() {
+  function startWebRTC() {
     rtcConn = new RTCPeerConnection({
       iceServers: [
         {
@@ -227,10 +245,10 @@ export async function useWsRTC(options: UseWSRTCOptions) {
     const data = decodeRTCDataChannelData(arr.buffer)
 
     switch (data.type) {
-      case RTCDataChannelDataType.Message:{
+      case RTCDataChannelDataType.Message: {
         break
       }
-      case RTCDataChannelDataType.FileSlice:{
+      case RTCDataChannelDataType.FileSlice: {
         const fileData = decodeRTCDataChannelFileSlice(data.payload)
         console.log('data channel file slice', fileData)
 
@@ -323,6 +341,7 @@ export async function useWsRTC(options: UseWSRTCOptions) {
   onUnmounted(() => {
     stopWatchData()
     stopWatchWsStatus()
+    stopWatchRTCStatus()
   })
 
   return {
@@ -332,6 +351,7 @@ export async function useWsRTC(options: UseWSRTCOptions) {
     senderId,
     sendWs,
     openWebsocket,
+    startWebRTC,
     sendFileWithRTC,
   }
 }

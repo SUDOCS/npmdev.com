@@ -5,6 +5,7 @@ const roomId = ref('')
 
 let openWebsocket: Fn
 let sendFileWithRTC: (file: File, onPercentage?: (name: string, percentage: number) => void) => void
+let startWebRTC: () => void
 const wsStatus = ref<WebSocketStatus>('CLOSED')
 const rtcStatus = ref<RTCPeerConnectionState>('closed')
 const dataChannelStatus = ref<RTCDataChannelState>('closed')
@@ -15,7 +16,7 @@ const fileList = ref<File[]>([])
 const percentages = ref<Record<string, number>>({})
 
 onMounted(async () => {
-  ({ openWebsocket, sendFileWithRTC } = await useWsRTC({
+  ({ openWebsocket, sendFileWithRTC, startWebRTC } = await useWsRTC({
     roomId,
     role: 'sender',
     roomUserIds,
@@ -24,6 +25,12 @@ onMounted(async () => {
     rtcStatus,
     dataChannelStatus,
   }))
+})
+
+watch(roomUserIds, (ids) => {
+  if (ids.length === 2) {
+    startWebRTC()
+  }
 })
 
 function onFileChange(e: Event) {
