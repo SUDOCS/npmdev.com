@@ -18,12 +18,13 @@ const percentages = ref<Record<string, number>>({})
 onMounted(async () => {
   ({ openWebsocket, sendFileWithRTC, startWebRTC } = await useWsRTC({
     roomId,
-    role: 'sender',
+    role: 'file-sender',
     roomUserIds,
     senderId,
     wsStatus,
     rtcStatus,
     dataChannelStatus,
+    autoGenerateRoomId: true,
   }))
 })
 

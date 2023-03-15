@@ -56,7 +56,7 @@ onMounted(() => {
 
 <template>
   <div relative text-20px @click="activeInput">
-    <input ref="inputEl" type="text" :value="props.modelValue" class="serial-number-input" @input="onInputChange">
+    <input ref="inputEl" type="text" :value="props.modelValue" class="serial-number-input" autocomplete="off" @input="onInputChange">
     <div frow gap-1em flex-center flex-wrap>
       <div
         v-for="(_, idx) in length" :key="idx" class="serial-number-box"

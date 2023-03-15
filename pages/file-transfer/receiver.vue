@@ -15,7 +15,7 @@ const fileList = ref<SliceFile[]>([])
 onMounted(async () => {
   ({ openWebsocket } = await useWsRTC({
     roomId,
-    role: 'receiver',
+    role: 'file-receiver',
     roomUserIds,
     senderId,
     wsStatus,

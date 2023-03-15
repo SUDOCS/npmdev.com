@@ -219,7 +219,7 @@ function openNewTab() {
 
 <template>
   <div
-    ref="windowEl" bg="#fff/70" shadow border border-solid border-gray-200
+    ref="windowEl" bg="#fff/70" shadow border border-solid border-gray-200 overflow-hidden
     class="window absolute-full lg:(w-360px h-640px absolute-center) fcol rounded-none lg:rounded-xl"
     :style="{ ...baseStyle, ...style }"
     @click.stop="zIndex = refreshAppIndex()"

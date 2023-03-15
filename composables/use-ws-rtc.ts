@@ -3,17 +3,18 @@ import { SliceFile } from '../utils/file'
 
 export interface UseWSRTCOptions {
   roomId: Ref<string>
-  role: 'sender' | 'receiver'
+  role: 'file-sender' | 'file-receiver' | 'screen-viewer'
   roomUserIds: Ref<number[]>
   senderId: Ref<number>
   wsStatus: Ref<WebSocketStatus>
   rtcStatus: Ref<RTCPeerConnectionState>
   dataChannelStatus: Ref<RTCDataChannelState>
+  autoGenerateRoomId?: boolean
   onFileReceived?: (file: SliceFile) => void
 }
 
 export async function useWsRTC(options: UseWSRTCOptions) {
-  const { wsStatus, rtcStatus, dataChannelStatus, roomId, role, roomUserIds, senderId } = options
+  const { wsStatus, rtcStatus, dataChannelStatus, roomId, role, roomUserIds, senderId, autoGenerateRoomId = false } = options
 
   const fileMap = new Map<number, {
     file: SliceFile
@@ -24,7 +25,7 @@ export async function useWsRTC(options: UseWSRTCOptions) {
   let rtcConn: RTCPeerConnection
   let dataChannel: RTCDataChannel
 
-  if (role === 'sender') {
+  if (autoGenerateRoomId) {
     console.log('generate room id')
     roomId.value = Array.from({ length: 6 }, () => Math.floor(Math.random() * 10)).join('')
   }
@@ -204,7 +205,7 @@ export async function useWsRTC(options: UseWSRTCOptions) {
       dataChannel.onerror = onDataChannelError
     }
 
-    if (role === 'sender') {
+    if (role === 'file-sender') {
       console.log('sender create data channel')
 
       dataChannel = rtcConn.createDataChannel('file')
