@@ -12,129 +12,12 @@ export interface UseWSRTCOptions {
   onFileReceived?: (file: SliceFile) => void
 }
 
-export enum RTCDataChannelDataType {
-  Message = 1,
-  FileSlice,
-}
-
-export interface RTCDataChannelData {
-  totalLength?: number // 2 bytes
-  type: RTCDataChannelDataType // 2 byte
-  payload: ArrayBuffer
-}
-
-function encodeRTCDataChannelData(data: RTCDataChannelData): ArrayBuffer {
-  const { type, payload } = data
-
-  const totalLength = 4 + payload.byteLength
-
-  const buffer = new ArrayBuffer(totalLength)
-  const view = new DataView(buffer)
-
-  view.setUint16(0, totalLength)
-  view.setUint16(2, type)
-
-  const payloadView = new Uint8Array(buffer, 4)
-  payloadView.set(new Uint8Array(payload))
-
-  return buffer
-}
-
-function decodeRTCDataChannelData(data: ArrayBuffer): RTCDataChannelData {
-  const view = new DataView(data)
-
-  const totalLength = view.getUint16(0)
-  const type = view.getUint16(2) as RTCDataChannelDataType
-
-  const payload = data.slice(4)
-
-  return {
-    totalLength,
-    type,
-    payload,
-  }
-}
-
-export interface RTCDataChannelFileSlice {
-  totalLength?: number // 2 bytes
-  // 标记传输一个文件
-  fileId: number // 1 bytes
-  hasMore: 0 | 1 // 1 byte
-
-  sliceSize: number // 4 bytes
-  fileSize: number // 4 bytes
-  sequence: number // 4 bytes
-
-  // offset: 16
-  fileNameLength?: number // 2 bytes
-  // offset: 18
-  fileName: string // 254 bytes
-
-  // offset: 272
-  payload: ArrayBuffer
-}
-
-function encodeRTCDataChannelFileSlice(data: RTCDataChannelFileSlice): ArrayBuffer {
-  const { fileId, sliceSize, fileSize, fileName, sequence, hasMore, payload } = data
-
-  const totalLength = 16 + 256 + payload.byteLength
-  const nameBuffer = new TextEncoder().encode(fileName)
-  const fileNameLength = nameBuffer.byteLength
-
-  const buffer = new ArrayBuffer(totalLength)
-  const view = new DataView(buffer)
-
-  view.setUint16(0, totalLength)
-  view.setUint8(2, fileId)
-  view.setUint8(3, hasMore)
-  view.setUint32(4, sliceSize)
-  view.setUint32(8, fileSize)
-  view.setUint32(12, sequence)
-  view.setUint16(16, fileNameLength)
-
-  const nameView = new Uint8Array(buffer, 18, 254)
-  nameView.set(nameBuffer)
-
-  const payloadView = new Uint8Array(buffer, 272)
-  payloadView.set(new Uint8Array(payload))
-
-  return buffer
-}
-
-function decodeRTCDataChannelFileSlice(data: ArrayBuffer): RTCDataChannelFileSlice {
-  const view = new DataView(data)
-
-  const totalLength = view.getUint16(0)
-  const fileId = view.getUint8(2)
-  const hasMore = view.getUint8(3) as 0 | 1
-  const sliceSize = view.getUint32(4)
-  const fileSize = view.getUint32(8)
-  const sequence = view.getUint32(12)
-  const fileNameLength = view.getUint16(16)
-
-  const fileName = new TextDecoder().decode(data.slice(18, 18 + fileNameLength))
-
-  const payload = data.slice(272)
-
-  return {
-    totalLength,
-    fileId,
-    hasMore,
-    sliceSize,
-    fileSize,
-    sequence,
-    fileNameLength,
-    fileName,
-    payload,
-  }
-}
-
 export async function useWsRTC(options: UseWSRTCOptions) {
   const { wsStatus, rtcStatus, dataChannelStatus, roomId, role, roomUserIds, senderId } = options
 
   const fileMap = new Map<number, {
     file: SliceFile
-    // 不同文件需要有不同的回调函数，不然可能会应为节流而没有被调用，忽略掉小文件s
+    // 不同文件需要有不同的回调函数，不然可能会应为节流而没有被调用，忽略掉小文件
     onReceived?: (file: SliceFile) => void
   }>()
 
@@ -169,7 +52,7 @@ export async function useWsRTC(options: UseWSRTCOptions) {
   })
 
   async function processWsData(data: ArrayBuffer | Blob) {
-    const d = await parseWsData(data)
+    const d = await decodeWsData(data)
     switch (d.action) {
       case WsAction.SendClientInfo: {
         console.log('setup client')
@@ -185,7 +68,7 @@ export async function useWsRTC(options: UseWSRTCOptions) {
       }
       case WsAction.SendRoomUserIds:{
         console.log('setup room', d.room, d.payload)
-        const { users } = parseRoomInfo(d.payload as ArrayBuffer)
+        const { users } = decodeRoomInfo(d.payload as ArrayBuffer)
         roomUserIds.value = users
 
         if (users.length === 2) {
@@ -193,47 +76,59 @@ export async function useWsRTC(options: UseWSRTCOptions) {
         }
         break
       }
-      case WsAction.CustomMessage:{
+      case WsAction.ApplicationMessage:{
         console.log(senderId.value, 'receive custom message from', d.sender, d.payload)
-        const { action, userId, payload } = parseWsRTCData(d.payload as ArrayBuffer)
 
         // 发送者是自己的话，不处理
         if (d.sender === senderId.value)
           break
 
-        switch (action) {
-          case WsRTCAction.Offer:{
-            const offer = JSON.parse(new TextDecoder().decode(payload))
-            console.log('receive offer from', userId, payload, offer)
-            await rtcConn.setRemoteDescription(offer)
-            const answer = await rtcConn.createAnswer()
-            await rtcConn.setLocalDescription(answer)
-            console.log('send answer', answer)
-            sendWs(buildWsData({
-              action: WsAction.CustomMessage,
-              room: parseInt(roomId.value),
-              sender: senderId.value,
-              payload: buildWsRTCData({
-                action: WsRTCAction.Answer,
-                userId: senderId.value,
-                payload: new TextEncoder().encode(JSON.stringify(answer)),
-              }),
-            }))
-            break
-          }
-          case WsRTCAction.Answer:{
-            const answer = JSON.parse(new TextDecoder().decode(payload))
-            console.log('receive answer from', userId, payload, answer)
-            await rtcConn.setRemoteDescription(answer)
-            break
-          }
-          case WsRTCAction.IceCandidate:{
-            const iceCandidate = JSON.parse(new TextDecoder().decode(payload))
-            console.log('receive ice candidate from', userId, payload, iceCandidate)
-            await rtcConn.addIceCandidate(iceCandidate)
+        switch (d.payloadType) {
+          case WsPayloadType.WebRTC:{
+            processWsWebRTCData(d.payload as ArrayBuffer)
             break
           }
         }
+
+        break
+      }
+    }
+  }
+
+  async function processWsWebRTCData(data: ArrayBuffer) {
+    const { action, userId, payload } = decodeWsRTCData(data)
+
+    switch (action) {
+      case WsRTCAction.Offer:{
+        const offer = JSON.parse(new TextDecoder().decode(payload))
+        console.log('receive offer from', userId, payload, offer)
+        await rtcConn.setRemoteDescription(offer)
+        const answer = await rtcConn.createAnswer()
+        await rtcConn.setLocalDescription(answer)
+        console.log('send answer', answer)
+        sendWs(buildWsData({
+          action: WsAction.ApplicationMessage,
+          payloadType: WsPayloadType.WebRTC,
+          room: parseInt(roomId.value),
+          sender: senderId.value,
+          payload: encodeWsRTCData({
+            action: WsRTCAction.Answer,
+            userId: senderId.value,
+            payload: new TextEncoder().encode(JSON.stringify(answer)),
+          }),
+        }))
+        break
+      }
+      case WsRTCAction.Answer:{
+        const answer = JSON.parse(new TextDecoder().decode(payload))
+        console.log('receive answer from', userId, payload, answer)
+        await rtcConn.setRemoteDescription(answer)
+        break
+      }
+      case WsRTCAction.IceCandidate:{
+        const iceCandidate = JSON.parse(new TextDecoder().decode(payload))
+        console.log('receive ice candidate from', userId, payload, iceCandidate)
+        await rtcConn.addIceCandidate(iceCandidate)
         break
       }
     }
@@ -251,10 +146,11 @@ export async function useWsRTC(options: UseWSRTCOptions) {
     rtcConn.onicecandidate = (e) => {
       console.log('onicecandidate', e)
       e.candidate && sendWs(buildWsData({
-        action: WsAction.CustomMessage,
+        action: WsAction.ApplicationMessage,
+        payloadType: WsPayloadType.WebRTC,
         room: parseInt(roomId.value),
         sender: senderId.value,
-        payload: buildWsRTCData({
+        payload: encodeWsRTCData({
           action: WsRTCAction.IceCandidate,
           userId: senderId.value,
           payload: new TextEncoder().encode(JSON.stringify(e.candidate)),
@@ -305,10 +201,11 @@ export async function useWsRTC(options: UseWSRTCOptions) {
         console.log('sender create offer', offer)
         rtcConn.setLocalDescription(offer)
         sendWs(buildWsData({
-          action: WsAction.CustomMessage,
+          action: WsAction.ApplicationMessage,
+          payloadType: WsPayloadType.WebRTC,
           room: parseInt(roomId.value),
           sender: senderId.value,
-          payload: buildWsRTCData({
+          payload: encodeWsRTCData({
             action: WsRTCAction.Offer,
             userId: senderId.value,
             payload: new TextEncoder().encode(JSON.stringify(offer)),

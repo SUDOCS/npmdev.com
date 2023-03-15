@@ -2,7 +2,7 @@ export enum WsAction {
   // client -> server
   JoinRoom = 1,
   LeaveRoom,
-  CustomMessage,
+  ApplicationMessage,
   FetchRoomInfo,
 
   // server -> client
@@ -11,12 +11,16 @@ export enum WsAction {
 }
 
 export enum WsPayloadType {
-  Text = 0,
-  Binary,
+  // 用作WebSocket自身的消息，比如加入房间、离开房间等
+  Reserved = 1,
+  // 用作应用层的消息，比如WebRTC、屏幕共享等
+  WebRTC,
+  ScreenShare,
 }
 
 export interface WsData {
   action: WsAction
+  // payload 的数据为哪个应用服务，根据这个寻找对应的解析方法
   payloadType?: WsPayloadType
   room: number
   sender: number
@@ -26,7 +30,7 @@ export interface WsData {
 const WsHeaderLen = 12
 
 export function buildWsData(data: WsData): ArrayBuffer {
-  const { action, payloadType = WsPayloadType.Binary, room, sender, payload = new ArrayBuffer(0) } = data
+  const { action, payloadType = WsPayloadType.Reserved, room, sender, payload = new ArrayBuffer(0) } = data
 
   const totalLength = WsHeaderLen + payload.byteLength
 
@@ -45,7 +49,7 @@ export function buildWsData(data: WsData): ArrayBuffer {
   return buffer
 }
 
-export async function parseWsData(data: ArrayBuffer | Blob): Promise<WsData> {
+export async function decodeWsData(data: ArrayBuffer | Blob): Promise<WsData> {
   if (data instanceof Blob) {
     data = await data.arrayBuffer()
   }
@@ -78,7 +82,7 @@ export interface RoomInfo {
 处理 SetupClient 下发的房间数据信息
 四个字节一个用户 ID，大端模式
  */
-export function parseRoomInfo(payload: ArrayBuffer): RoomInfo {
+export function decodeRoomInfo(payload: ArrayBuffer): RoomInfo {
   const users = []
 
   const view = new DataView(payload)
@@ -95,54 +99,5 @@ export function parseRoomInfo(payload: ArrayBuffer): RoomInfo {
 
   return {
     users,
-  }
-}
-
-export enum WsRTCAction {
-  IceCandidate = 1,
-  Offer,
-  Answer,
-}
-
-// WsData 的 payload 中的 WsRTCData，此时 WsData 中的 action 为 CustomMessage
-export interface WsRTCData {
-  totalLength?: number
-  action: WsRTCAction
-  userId: number
-  payload?: Uint8Array
-}
-
-export function buildWsRTCData(data: WsRTCData): ArrayBuffer {
-  const { action, userId, payload = new ArrayBuffer(0) } = data
-
-  const totalLength = 8 + payload.byteLength
-
-  const header = new ArrayBuffer(8)
-  const headerView = new DataView(header)
-  headerView.setUint16(0, totalLength)
-  headerView.setUint8(2, action)
-  headerView.setUint32(4, userId)
-
-  const buffer = new Uint8Array(totalLength)
-  buffer.set(new Uint8Array(header), 0)
-  buffer.set(new Uint8Array(payload), 8)
-
-  return buffer
-}
-
-export function parseWsRTCData(data: ArrayBuffer): WsRTCData {
-  const header = data.slice(0, 8)
-
-  const headerView = new DataView(header)
-  const totalLength = headerView.getUint16(0)
-  const action = headerView.getUint8(2)
-  const userId = headerView.getUint32(4)
-  const payload = new Uint8Array(data.slice(8, totalLength))
-
-  return {
-    totalLength,
-    action,
-    userId,
-    payload,
   }
 }
