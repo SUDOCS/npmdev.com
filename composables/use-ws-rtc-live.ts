@@ -8,9 +8,10 @@ export function useWsRTCLive(options: UseWsRTCLiveOptions) {
   const { videoEle } = options
   const { roomId, senderId, roomUserIds, wsStatus, openWebsocket, sendAppMsg } = useWs({
     autoGenerateRoomId: false,
-    messageHandler: handleLiveMessage,
+    messageHandler: handleLiveAndChatMessage,
   })
 
+  const chatMessages = shallowRef<{ sender: number; msg: string }[]>([])
   const streamName = computed(() => `${roomId.value}-${senderId.value}`)
 
   const { publish, unpublish, pushing, stream: pushStrem } = useRTCPublisher()
@@ -50,22 +51,45 @@ export function useWsRTCLive(options: UseWsRTCLiveOptions) {
     }
   }
 
-  function handleLiveMessage(sender: number, type: WsPayloadType, data: ArrayBuffer) {
+  function handleLiveAndChatMessage(sender: number, type: WsPayloadType, data: ArrayBuffer) {
     if (type === WsPayloadType.Live) {
       console.log('receive live message', sender, data)
       const liveData = decodeWsLiveData(data)
 
       switch (liveData.action) {
-        case WsLiveAction.Publish:{
+        case WsLiveAction.Publish: {
           const info = decodeLiveInfo(liveData.payload)
           play(info.liveName)
           break
         }
-        case WsLiveAction.Message:{
+        case WsLiveAction.Message: {
           break
         }
       }
     }
+    else if (type === WsPayloadType.Chat) {
+      console.log('receive chat message', sender, data)
+      const chatData = decodeChatMessage(data)
+      switch (chatData.type) {
+        case ChatMessageType.Text: {
+          const text = decodeTextMessage(chatData.payload)
+          console.log('receive text message', text)
+          chatMessages.value = chatMessages.value.concat([{ sender, msg: text.text }])
+          break
+        }
+      }
+    }
+  }
+
+  function sendChatMessage(message: string) {
+    sendAppMsg(WsPayloadType.Chat, encodeChatMessage({
+      type: ChatMessageType.Text,
+      payload: encodeTextMessage({
+        text: message,
+      }),
+    }))
+
+    chatMessages.value = chatMessages.value.concat([{ sender: senderId.value, msg: message }])
   }
 
   onUnmounted(() => {
@@ -85,5 +109,7 @@ export function useWsRTCLive(options: UseWsRTCLiveOptions) {
     pulling,
     openWebsocket,
     togglePublish,
+    sendChatMessage,
+    chatMessages,
   }
 }

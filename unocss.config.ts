@@ -8,6 +8,10 @@ export default defineConfig({
   theme: {
     colors: {
       textShadowColor: '#1C1F21',
+      primary: '#00AEEC',
+      primaryHover: '#00B8F6',
+      avatarBg: '#E5E8EE',
+      divider: '#DDD',
     },
   },
   presets: [

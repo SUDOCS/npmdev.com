@@ -16,6 +16,7 @@ export enum WsPayloadType {
   // 用作应用层的消息，比如WebRTC、屏幕共享等
   WebRTC,
   Live,
+  Chat,
 }
 
 export interface WsData {

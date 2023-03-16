@@ -1,13 +1,27 @@
 <script setup lang="ts">
 const videoEle = ref<HTMLVideoElement>()
 
-const { roomId, senderId, roomUserIds, wsStatus, pushing, pulling, openWebsocket, togglePublish } = useWsRTCLive({
+const {
+  roomId,
+  senderId,
+  roomUserIds,
+  wsStatus,
+  pushing,
+  pulling,
+  chatMessages,
+  openWebsocket,
+  togglePublish,
+  sendChatMessage,
+} = useWsRTCLive({
   videoEle,
 })
 
 const showMember = ref(false)
 const showChat = ref(false)
 const showSidebar = computed(() => showMember.value || showChat.value)
+const muted = ref(false)
+const paused = ref(false)
+const inputMsg = ref('')
 
 function generateRoomId() {
   roomId.value = Math.random().toString(10).slice(2, 8)
@@ -21,6 +35,13 @@ function toggleSidebar(val: 'member' | 'chat') {
   else {
     showChat.value = !showChat.value
     showMember.value = false
+  }
+}
+
+function sendMsg() {
+  if (inputMsg.value) {
+    sendChatMessage(inputMsg.value)
+    inputMsg.value = ''
   }
 }
 </script>
@@ -43,7 +64,7 @@ function toggleSidebar(val: 'member' | 'chat') {
       my-xl shadow transition flex-center
       :class="{
         'bg-black': roomId.length === 6,
-        'bg-black/50': roomId.length !== 6,
+        'bg-gray': roomId.length !== 6,
       }"
     >
       <loading-spinner v-if="wsStatus === 'CONNECTING'" />
@@ -51,8 +72,8 @@ function toggleSidebar(val: 'member' | 'chat') {
     </div>
   </div>
 
-  <div fcol h="100vh">
-    <div flex-1 w-full frow items-stretch overflow-hidden>
+  <div fcol h="100vh" class="live">
+    <div flex-1 w-full frow items-stretch overflow-hidden relative>
       <div class="live-main" overflow-y-auto overflow-x-hidden relative>
         <div v-show="!pushing && !pulling">
           <div pt-xl>
@@ -61,7 +82,7 @@ function toggleSidebar(val: 'member' | 'chat') {
           <div frow flex-wrap gap-xl py-xl items-center justify-center>
             <div v-for="(userId, idx) in roomUserIds" :key="idx" fcol>
               <div
-                w-16 h-16 lh-16 text-center bg-orange:10 rounded="1/2" border="~ #ddd solid"
+                w-16 h-16 lh-16 text-center bg-avatar-bg rounded="1/2" border="~ divider solid"
               >
                 {{ userId.toString().slice(0, 4) }}
               </div>
@@ -82,12 +103,12 @@ function toggleSidebar(val: 'member' | 'chat') {
       <div v-show="showSidebar" class="live-side" relative>
         <!-- 成员 -->
         <div v-show="showMember" h-full overflow-y-auto>
-          <div v-for="x in 20" :key="x" frow gap-xs px-3 py-2 border="~ #eee b-solid" last="border-none">
-            <div rounded="1/2" w-12 h-12 lh-12 text-center bg-orange:10 border="~ #ddd solid">
-              <span>{{ (x + 100).toString().slice(0, 3) }}</span>
+          <div v-for="userId in roomUserIds" :key="userId" frow gap-xs px-3 py-2 border="~ divider b-solid">
+            <div rounded="1/2" w-12 h-12 lh-12 text-center bg-avatar-bg border="~ divider solid">
+              <span>{{ userId.toString().slice(0, 3) }}</span>
             </div>
             <div>
-              14321432
+              {{ userId }}
             </div>
           </div>
         </div>
@@ -95,17 +116,17 @@ function toggleSidebar(val: 'member' | 'chat') {
         <div v-show="showChat" fcol h-full>
           <!-- 聊天记录 -->
 
-          <div flex-1 w-full>
-            12
+          <div flex-1 w-full overflow-y-auto>
+            <ChatMessage v-for="(msg, idx) in chatMessages" :key="idx" :from="msg.sender.toString()" type="chat" :msg="msg.msg" :left="msg.sender !== senderId" />
           </div>
           <!-- 输入区域 -->
 
-          <div h-20 w-full relative border="~ #ddd t-solid">
-            <textarea name="chatInput" rows="10" border-none w-full h-full outline-none p-xs />
-
+          <div h-20 w-full relative border="~ divider t-solid">
+            <textarea v-model="inputMsg" name="chatInput" rows="10" border-none w-full h-full outline-none p-xs />
             <div
               absolute right-4 bottom-4 px-4 py-1 border-none outline-none text-xs
-              bg-black:20 rounded-sm cursor-pointer hover:bg-black:30 transition
+              bg-primary hover:bg-primary-hover text-white rounded-sm cursor-pointer hover:bg-black:30 transition
+              @click="sendMsg"
             >
               发送
             </div>
@@ -115,9 +136,21 @@ function toggleSidebar(val: 'member' | 'chat') {
     </div>
 
     <div class="live-bottom-bar">
-      <div class="live-bottom-button">
+      <div v-show="pulling && !muted" class="live-bottom-button">
         <Icon name="fluent:speaker-mute-24-regular" class="live-bottom-button-icon" />
-        <span>静音</span>
+        <span>开启静音</span>
+      </div>
+      <div v-show="pulling && muted" class="live-bottom-button">
+        <Icon name="octicon:unmute-24" class="live-bottom-button-icon" />
+        <span>解除静音</span>
+      </div>
+      <div v-show="pulling && paused" class="live-bottom-button">
+        <Icon name="fluent:play-24-regular" class="live-bottom-button-icon" />
+        <span>继续播放</span>
+      </div>
+      <div v-show="pulling && !paused" class="live-bottom-button">
+        <Icon name="fluent:pause-24-regular" class="live-bottom-button-icon" />
+        <span>暂停播放</span>
       </div>
       <div class="live-bottom-button" @click="togglePublish">
         <Icon name="fluent:dual-screen-desktop-24-regular" class="live-bottom-button-icon" />
@@ -141,8 +174,9 @@ function toggleSidebar(val: 'member' | 'chat') {
 }
 
 .live-side{
-  @apply w-40 h-full md:w-60 lg:w-70 xl:w-80 2xl:w-100 bg-white border border-#eee border-l-solid
-  relative;
+  @apply h-full md:w-90 2xl:w-120
+  bg-white border border-#eee border-l-solid
+  absolute-full md:relative;
 }
 
 .live-bottom-bar{
