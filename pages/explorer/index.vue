@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import computerSvg from '@/assets/icons/apps/computer.svg?inline'
+import driverSvg from '@/assets/icons/apps/drive-network.svg?inline'
 </script>
 
 <template>
   <div class="explorer-entry-list">
     <div class="explorer-entry">
-      <img :src="computerSvg" alt="">
+      <img :src="driverSvg" alt="">
       <div class="explorer-entry-space-detail">
         <div>阿里云</div>
         <progress class="explorer-entry-space-bar" value="10" max="100" />
@@ -17,7 +17,7 @@ import computerSvg from '@/assets/icons/apps/computer.svg?inline'
       </div>
     </div>
     <div class="explorer-entry">
-      <img :src="computerSvg" alt="">
+      <img :src="driverSvg" alt="">
       <div class="explorer-entry-space-detail">
         <div>腾讯云</div>
         <progress class="explorer-entry-space-bar" value="10" max="100" />
@@ -29,10 +29,10 @@ import computerSvg from '@/assets/icons/apps/computer.svg?inline'
       </div>
     </div>
     <div v-for="x in 5" :key="x" class="explorer-entry">
-      <img :src="computerSvg" alt="">
+      <img :src="driverSvg" alt="">
       <div class="explorer-entry-space-detail">
         <div>AWS S3</div>
-        <progress class="explorer-entry-space-bar" value="10" max="100" />
+        <progress class="explorer-entry-space-bar" :value="Math.random() * 100" max="100" />
         <div>
           <span>已用 1.2GB</span>
           <span> / </span>
@@ -50,8 +50,8 @@ import computerSvg from '@/assets/icons/apps/computer.svg?inline'
     2xl:grid-cols-5;
 }
 .explorer-entry{
-    @apply h-20 bg-white rounded-xl
-    frow text-sm shadow cursor-pointer
+    @apply h-20 rounded-xl
+    frow text-sm cursor-pointer border border-solid border-divider
     hover:bg-black/5 transition-colors duration-300;
 
     &-space-detail{
@@ -59,7 +59,15 @@ import computerSvg from '@/assets/icons/apps/computer.svg?inline'
     }
 
     &-space-bar{
-        @apply w-full h-2 my-1 bg-black:10;
+        @apply w-full h-2 my-1 bg-divider;
+
+        &::-webkit-progress-bar{
+            @apply bg-divider;
+        }
+
+        &::-webkit-progress-value{
+            @apply bg-primary;
+        }
     }
 
     img{
