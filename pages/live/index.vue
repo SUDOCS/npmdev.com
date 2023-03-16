@@ -1,18 +1,7 @@
 <script setup lang="ts">
 const video = ref()
 
-const app = useNuxtApp()
-
-const {
-  roomId,
-  senderId,
-  roomUserIds,
-  wsStatus,
-  rtcStatus,
-  dataChannelStatus,
-  sendWs,
-  openWebsocket,
-} = useWsRTC({ role: 'screen-viewer' })
+const { roomId, senderId, roomUserIds, wsStatus, sendWs, openWebsocket } = useWs()
 
 let rtcConn: RTCPeerConnection
 
