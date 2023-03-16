@@ -1,15 +1,15 @@
-import { WsPayloadType } from './../utils/websocket'
-import type { UseRTCOptions } from './use-rtc'
+import { WsPayloadType } from '../utils/websocket'
+import type { UseRTCFileTransferOptions } from './use-rtc-file-transfer'
 import type { UseWsOptions } from './use-ws'
 
-export function useWsRTC(options: UseWsOptions & UseRTCOptions) {
+export function useWsRTCFileTransfer(options: UseWsOptions & UseRTCFileTransferOptions) {
   options.messageHandler = handleWsAppMessage
 
   const { roomId, senderId, roomUserIds, wsStatus, openWebsocket, sendAppMsg } = useWs(options)
 
   options.sendAppMessage = sendAppMsg
 
-  const { rtcStatus, dataChannelStatus, startWebRTC, sendFileWithRTC, processRTCSignalingData } = useRTC(options)
+  const { rtcStatus, dataChannelStatus, startWebRTC, sendFileWithRTC, processRTCSignalingData } = useRTCFileTransfer(options)
 
   function handleWsAppMessage(sender: number, type: WsPayloadType, data: ArrayBuffer) {
     switch (type) {

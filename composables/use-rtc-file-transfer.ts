@@ -1,13 +1,13 @@
 import { SliceFile } from '../utils/file'
 import type { SendAppMessageFn } from './use-ws'
 
-export interface UseRTCOptions {
-  role: 'file-sender' | 'file-receiver'
+export interface UseRTCFileTransferOptions {
+  role: 'sender' | 'receiver'
   onFileReceived?: (file: SliceFile) => void
   sendAppMessage?: SendAppMessageFn
 }
 
-export function useRTC(options: UseRTCOptions) {
+export function useRTCFileTransfer(options: UseRTCFileTransferOptions) {
   const rtcStatus = ref<RTCPeerConnectionState | 'notcreated' | 'created'>('notcreated')
   const dataChannelStatus = ref<RTCDataChannelState>('closed')
 
@@ -114,7 +114,7 @@ export function useRTC(options: UseRTCOptions) {
       dataChannel.onerror = onDataChannelError
     }
 
-    if (role === 'file-sender') {
+    if (role === 'sender') {
       console.log('sender create data channel')
 
       dataChannel = rtcConn.createDataChannel('file')

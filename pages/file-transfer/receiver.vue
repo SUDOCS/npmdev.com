@@ -11,7 +11,7 @@ const {
   rtcStatus,
   dataChannelStatus,
   openWebsocket,
-} = useWsRTC({ role: 'file-receiver', onFileReceived })
+} = useWsRTCFileTransfer({ role: 'receiver', onFileReceived })
 
 function onFileReceived(file: SliceFile) {
   console.log('on file received', file)

@@ -12,7 +12,7 @@ const {
   startWebRTC,
   sendFileWithRTC,
   openWebsocket,
-} = useWsRTC({ role: 'file-sender', autoGenerateRoomId: true })
+} = useWsRTCFileTransfer({ role: 'sender', autoGenerateRoomId: true })
 
 watch(roomUserIds, (ids) => {
   if (ids.length === 2) {
