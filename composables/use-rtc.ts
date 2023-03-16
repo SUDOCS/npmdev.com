@@ -7,12 +7,6 @@ export interface UseRTCOptions {
   sendAppMessage?: SendAppMessageFn
 }
 
-export function sendRTCSignalingData(sendAppMessage: SendAppMessageFn) {
-  return (data: ArrayBuffer) => {
-    sendAppMessage(WsPayloadType.WebRTC, data)
-  }
-}
-
 export function useRTC(options: UseRTCOptions) {
   const rtcStatus = ref<RTCPeerConnectionState | 'notcreated' | 'created'>('notcreated')
   const dataChannelStatus = ref<RTCDataChannelState>('closed')
@@ -33,7 +27,7 @@ export function useRTC(options: UseRTCOptions) {
   })
 
   function sendSignaling(data: ArrayBuffer) {
-    sendAppMessage && sendRTCSignalingData(sendAppMessage)(data)
+    sendAppMessage && sendAppMessage(WsPayloadType.WebRTC, data)
   }
 
   async function processRTCSignalingData(sender: number, data: ArrayBuffer) {
