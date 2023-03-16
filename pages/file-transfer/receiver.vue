@@ -1,29 +1,17 @@
 <script setup lang="ts">
-import type { Fn, WebSocketStatus } from '@vueuse/core'
 import type { SliceFile } from '~~/utils/file'
-
-let openWebsocket: Fn
-const roomId = ref('')
-const wsStatus = ref<WebSocketStatus>('CLOSED')
-const rtcStatus = ref<RTCPeerConnectionState>('closed')
-const dataChannelStatus = ref<RTCDataChannelState>('closed')
-const roomUserIds = ref<number[]>([])
-const senderId = ref(0)
 
 const fileList = ref<SliceFile[]>([])
 
-onMounted(async () => {
-  ({ openWebsocket } = await useWsRTC({
-    roomId,
-    role: 'file-receiver',
-    roomUserIds,
-    senderId,
-    wsStatus,
-    rtcStatus,
-    dataChannelStatus,
-    onFileReceived,
-  }))
-})
+const {
+  roomId,
+  roomUserIds,
+  senderId,
+  wsStatus,
+  rtcStatus,
+  dataChannelStatus,
+  openWebsocket,
+} = useWsRTC({ role: 'file-receiver', onFileReceived })
 
 function onFileReceived(file: SliceFile) {
   console.log('on file received', file)

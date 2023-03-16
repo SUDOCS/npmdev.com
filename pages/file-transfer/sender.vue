@@ -1,32 +1,18 @@
 <script setup lang="ts">
-import type { Fn, WebSocketStatus } from '@vueuse/core'
-
-const roomId = ref('')
-
-let openWebsocket: Fn
-let sendFileWithRTC: (file: File, onPercentage?: (name: string, percentage: number) => void) => void
-let startWebRTC: () => void
-const wsStatus = ref<WebSocketStatus>('CLOSED')
-const rtcStatus = ref<RTCPeerConnectionState>('closed')
-const dataChannelStatus = ref<RTCDataChannelState>('closed')
-const roomUserIds = ref<number[]>([])
-const senderId = ref(0)
-
 const fileList = ref<File[]>([])
 const percentages = ref<Record<string, number>>({})
 
-onMounted(async () => {
-  ({ openWebsocket, sendFileWithRTC, startWebRTC } = await useWsRTC({
-    roomId,
-    role: 'file-sender',
-    roomUserIds,
-    senderId,
-    wsStatus,
-    rtcStatus,
-    dataChannelStatus,
-    autoGenerateRoomId: true,
-  }))
-})
+const {
+  roomId,
+  senderId,
+  roomUserIds,
+  wsStatus,
+  rtcStatus,
+  dataChannelStatus,
+  startWebRTC,
+  sendFileWithRTC,
+  openWebsocket,
+} = useWsRTC({ role: 'file-sender', autoGenerateRoomId: true })
 
 watch(roomUserIds, (ids) => {
   if (ids.length === 2) {

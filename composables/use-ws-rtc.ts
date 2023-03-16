@@ -2,19 +2,20 @@ import type { WebSocketStatus } from '@vueuse/core'
 import { SliceFile } from '../utils/file'
 
 export interface UseWSRTCOptions {
-  roomId: Ref<string>
   role: 'file-sender' | 'file-receiver' | 'screen-viewer'
-  roomUserIds: Ref<number[]>
-  senderId: Ref<number>
-  wsStatus: Ref<WebSocketStatus>
-  rtcStatus: Ref<RTCPeerConnectionState>
-  dataChannelStatus: Ref<RTCDataChannelState>
   autoGenerateRoomId?: boolean
   onFileReceived?: (file: SliceFile) => void
 }
 
-export async function useWsRTC(options: UseWSRTCOptions) {
-  const { wsStatus, rtcStatus, dataChannelStatus, roomId, role, roomUserIds, senderId, autoGenerateRoomId = false } = options
+export function useWsRTC(options: UseWSRTCOptions) {
+  const roomId = ref('')
+  const wsStatus = ref<WebSocketStatus>('CLOSED')
+  const rtcStatus = ref<RTCPeerConnectionState>('closed')
+  const dataChannelStatus = ref<RTCDataChannelState>('closed')
+  const roomUserIds = ref<number[]>([])
+  const senderId = ref(0)
+
+  const { role, autoGenerateRoomId = false } = options
 
   const fileMap = new Map<number, {
     file: SliceFile
@@ -350,6 +351,9 @@ export async function useWsRTC(options: UseWSRTCOptions) {
     roomId,
     roomUserIds,
     senderId,
+    wsStatus,
+    rtcStatus,
+    dataChannelStatus,
     sendWs,
     openWebsocket,
     startWebRTC,

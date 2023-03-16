@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import type { Fn, WebSocketStatus } from '@vueuse/core'
-
-const roomId = ref('')
 const video = ref()
 
-let openWebsocket: Fn
-let sendWs: (data: string | ArrayBuffer | Blob, useBuffer?: boolean | undefined) => boolean
-const wsStatus = ref<WebSocketStatus>('CLOSED')
-const rtcStatus = ref<RTCPeerConnectionState>('closed')
-const dataChannelStatus = ref<RTCDataChannelState>('closed')
-const roomUserIds = ref<number[]>([])
-const senderId = ref(0)
+const app = useNuxtApp()
+
+const {
+  roomId,
+  senderId,
+  roomUserIds,
+  wsStatus,
+  rtcStatus,
+  dataChannelStatus,
+  sendWs,
+  openWebsocket,
+} = useWsRTC({ role: 'screen-viewer' })
 
 let rtcConn: RTCPeerConnection
 
@@ -18,7 +20,7 @@ function startRTC() {
   rtcConn = new RTCPeerConnection()
 }
 
-const { stream, start: startScreenSharing, enabled: onSharing } = useDisplayMedia()
+const { stream, start: startScreenSharing, stop: stopScreenSharing, enabled: onSharing } = useDisplayMedia()
 
 watch(stream, (s) => {
   console.log('stream', s, video.value)
@@ -29,16 +31,6 @@ watch(stream, (s) => {
 })
 
 onMounted(async () => {
-  ({ openWebsocket, sendWs } = await useWsRTC({
-    roomId,
-    role: 'screen-viewer',
-    roomUserIds,
-    senderId,
-    wsStatus,
-    rtcStatus,
-    dataChannelStatus,
-  }))
-
   roomUserIds.value = Array.from({ length: 90 }, () => Math.floor(Math.random() * 1000000))
 })
 
@@ -95,8 +87,8 @@ function generateRoomId() {
           </div>
         </div>
 
-        <div absolute-full flex-center>
-          <video v-show="onSharing" ref="video" w-full h-full autoplay />
+        <div v-show="onSharing" absolute-full flex-center>
+          <video ref="video" w-full h-full autoplay />
         </div>
       </div>
 

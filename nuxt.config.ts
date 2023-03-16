@@ -25,6 +25,10 @@ export default defineNuxtConfig({
   pinia: {
     autoImports: ['defineStore', 'storeToRefs'],
   },
+  routeRules: {
+    '/file-transfer/*': { ssr: false }, /* 一个*，不包括index，但包含 sender 和 receiver */
+    '/live': { ssr: false },
+  },
   vite: {
     css: {
       preprocessorOptions: {
