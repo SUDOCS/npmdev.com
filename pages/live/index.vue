@@ -23,10 +23,6 @@ const muted = ref(false)
 const paused = ref(false)
 const inputMsg = ref('')
 
-function generateRoomId() {
-  roomId.value = Math.random().toString(10).slice(2, 8)
-}
-
 function toggleSidebar(val: 'member' | 'chat') {
   if (val === 'member') {
     showMember.value = !showMember.value
@@ -47,30 +43,12 @@ function sendMsg() {
 </script>
 
 <template>
-  <div v-show="wsStatus !== 'OPEN'" absolute inset-0 fcol justify-center gap-10 p-10 z-1 bg-white>
-    <div text-center>
-      <div text-xl>
-        匹配序列号
-      </div>
-      <SerialNumber v-model="roomId" py-xl />
-
-      <div underline cursor-pointer @click="generateRoomId">
-        随机生成
-      </div>
-    </div>
-
-    <div
-      w-4em h-4em lh-4em rounded="50%" text-center mx-auto text-white cursor-pointer
-      my-xl shadow transition flex-center
-      :class="{
-        'bg-black': roomId.length === 6,
-        'bg-gray': roomId.length !== 6,
-      }"
-    >
-      <loading-spinner v-if="wsStatus === 'CONNECTING'" />
-      <span v-else @click="openWebsocket">开启</span>
-    </div>
-  </div>
+  <transition name="fade">
+    <SerialNumberOverlay
+      v-model="roomId" :show="wsStatus !== 'OPEN'" title="匹配序列号"
+      :loading="wsStatus === 'CONNECTING'" auto-generate :open="openWebsocket"
+    />
+  </transition>
 
   <div fcol h="100vh" class="live">
     <div flex-1 w-full frow items-stretch overflow-hidden relative>
