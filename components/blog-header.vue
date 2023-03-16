@@ -30,7 +30,7 @@ const wallpaper = ref(wallpapers[Math.floor(Math.random() * wallpapers.length)])
 }
 .blog-header {
   @apply h-20rem md:h-25rem w-full bg-center bg-no-repeat flex-center text-white
-  transition-all duration-300ms transition-ease-out;
+  transition-all duration-300ms transition-ease-out bg-cover;
 
   .title-box {
     text-shadow: 0 0 4px #1c1f21;
