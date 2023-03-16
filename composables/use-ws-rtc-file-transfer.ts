@@ -12,16 +12,12 @@ export function useWsRTCFileTransfer(options: UseWsOptions & UseRTCFileTransferO
   const { rtcStatus, dataChannelStatus, startWebRTC, sendFileWithRTC, processRTCSignalingData } = useRTCFileTransfer(options)
 
   function handleWsAppMessage(sender: number, type: WsPayloadType, data: ArrayBuffer) {
-    switch (type) {
-      case WsPayloadType.WebRTC: {
-        if (rtcStatus.value === 'notcreated') { // 接收者被动启动 WebRTC
-          startWebRTC()
-        }
-
-        processRTCSignalingData(sender, data)
-
-        break
+    if (type === WsPayloadType.WebRTC) {
+      if (rtcStatus.value === 'notcreated') { // 接收者被动启动 WebRTC
+        startWebRTC()
       }
+
+      processRTCSignalingData(sender, data)
     }
   }
 

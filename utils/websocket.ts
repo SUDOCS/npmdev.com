@@ -15,7 +15,7 @@ export enum WsPayloadType {
   Reserved = 1,
   // 用作应用层的消息，比如WebRTC、屏幕共享等
   WebRTC,
-  ScreenShare,
+  Live,
 }
 
 export interface WsData {

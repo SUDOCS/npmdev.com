@@ -16,7 +16,7 @@ export function useWs(options?: UseWsOptions) {
 
   if (autoGenerateRoomId) {
     console.log('generate room id')
-    roomId.value = Array.from({ length: 6 }, () => Math.floor(Math.random() * 10)).join('')
+    roomId.value = Math.random().toString(10).slice(2, 8)
   }
 
   const { status: wsStatus, data, send: sendWs, open: openWebsocket } = useWebSocket(import.meta.env.VITE_WS_URL, {

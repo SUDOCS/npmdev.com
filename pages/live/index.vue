@@ -1,26 +1,8 @@
 <script setup lang="ts">
-const video = ref()
+const videoEle = ref<HTMLVideoElement>()
 
-const { roomId, senderId, roomUserIds, wsStatus, sendWs, openWebsocket } = useWs()
-
-let rtcConn: RTCPeerConnection
-
-function startRTC() {
-  rtcConn = new RTCPeerConnection()
-}
-
-const { stream, start: startScreenSharing, stop: stopScreenSharing, enabled: onSharing } = useDisplayMedia()
-
-watch(stream, (s) => {
-  console.log('stream', s, video.value)
-
-  // preview on a video element
-  if (video.value && s)
-    video.value.srcObject = s
-})
-
-onMounted(async () => {
-  roomUserIds.value = Array.from({ length: 90 }, () => Math.floor(Math.random() * 1000000))
+const { roomId, senderId, roomUserIds, wsStatus, pushing, pulling, openWebsocket, togglePublish } = useWsRTCLive({
+  videoEle,
 })
 
 function generateRoomId() {
@@ -29,8 +11,7 @@ function generateRoomId() {
 </script>
 
 <template>
-  <!-- <div v-show="wsStatus !== 'OPEN'" h-100vh fcol justify-center gap-10 p-10> -->
-  <div v-show="false" absolute inset-0 fcol justify-center gap-10 p-10 z-1 bg-white>
+  <div v-show="wsStatus !== 'OPEN'" absolute inset-0 fcol justify-center gap-10 p-10 z-1 bg-white>
     <div text-center>
       <div text-xl>
         匹配序列号
@@ -58,7 +39,7 @@ function generateRoomId() {
   <div fcol h="100vh">
     <div flex-1 w-full frow items-stretch overflow-hidden>
       <div class="live-main" overflow-y-auto overflow-x-hidden relative>
-        <div v-show="!onSharing">
+        <div v-show="!pushing && !pulling">
           <div pt-xl>
             {{ roomId }}，在线用户
           </div>
@@ -76,8 +57,8 @@ function generateRoomId() {
           </div>
         </div>
 
-        <div v-show="onSharing" absolute-full flex-center>
-          <video ref="video" w-full h-full autoplay />
+        <div v-show="pushing || pulling" absolute-full flex-center>
+          <video ref="videoEle" w-full h-full autoplay />
         </div>
       </div>
 
@@ -99,7 +80,7 @@ function generateRoomId() {
         <Icon name="fluent:speaker-mute-24-regular" class="live-bottom-button-icon" />
         <span>静音</span>
       </div>
-      <div class="live-bottom-button" @click="startScreenSharing">
+      <div class="live-bottom-button" @click="togglePublish">
         <Icon name="fluent:dual-screen-desktop-24-regular" class="live-bottom-button-icon" />
         <span>分享屏幕</span>
       </div>
