@@ -43,7 +43,7 @@ function onPercentage(name: string, percentage: number) {
 <template>
   <transition name="fade">
     <SerialNumberOverlay
-      v-model="roomId" :show="wsStatus !== 'OPEN'" title="芝麻开门" subtitle="*输入序列，用于匹配发送者与接收者"
+      v-model="roomId" :show="wsStatus !== 'OPEN'" title="芝麻开门" subtitle="*输入6位数字，用于匹配发送者与接收者"
       :loading="wsStatus === 'CONNECTING'" auto-generate :open="openWebsocket"
     />
   </transition>

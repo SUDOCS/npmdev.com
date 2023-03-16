@@ -45,7 +45,7 @@ function sendMsg() {
 <template>
   <transition name="fade">
     <SerialNumberOverlay
-      v-model="roomId" :show="wsStatus !== 'OPEN'" title="匹配序列号"
+      v-model="roomId" :show="wsStatus !== 'OPEN'" title="匹配序列号" subtitle="输入6位数字"
       :loading="wsStatus === 'CONNECTING'" auto-generate :open="openWebsocket"
     />
   </transition>

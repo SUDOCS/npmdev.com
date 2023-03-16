@@ -57,7 +57,7 @@ function start() {
       <SerialNumber v-model="serialVal" py-xl />
 
       <div v-show="autoGenerate" underline cursor-pointer @click="generateRoomId">
-        随机生成
+        一键随机生成
       </div>
     </div>
 
