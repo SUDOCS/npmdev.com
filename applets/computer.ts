@@ -12,4 +12,5 @@ export default defineAppletConfig({
   route: '/computer',
   windowWidth: '36vh',
   windowHeight: '64vh',
+  enableOpenInNewTab: false,
 })
