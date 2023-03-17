@@ -63,11 +63,7 @@ function start() {
 
     <div
       w-4em h-4em lh-4em rounded="50%" text-center mx-auto text-white cursor-pointer
-      my-xl shadow transition flex-center
-      :class="{
-        'bg-black': serialVal.length === 6,
-        'bg-#5F5E6C': serialVal.length !== 6,
-      }"
+      my-xl shadow transition flex-center bg-black
     >
       <loading-spinner v-if="loading" />
       <span v-else @click="start">开启</span>
