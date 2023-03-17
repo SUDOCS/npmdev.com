@@ -5,4 +5,5 @@ export default defineAppletConfig({
   title: '阅读',
   icon: 'chmsee',
   route: '/reader',
+  hidden: true,
 })

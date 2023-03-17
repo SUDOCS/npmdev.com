@@ -6,4 +6,5 @@ export default defineAppletConfig({
   icon: 'music',
   backgroundColor: '#EAEAEA',
   customTitleBar: true,
+  hidden: true,
 })

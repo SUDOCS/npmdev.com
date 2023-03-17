@@ -4,4 +4,5 @@ export default defineAppletConfig({
   name: 'github',
   title: 'Github',
   icon: 'github',
+  hidden: true,
 })

@@ -26,7 +26,7 @@ const AllApps = [
   Launcher,
   Settings,
   TrashBin,
-]
+].filter(app => !app.hidden)
 
 export default AllApps
 

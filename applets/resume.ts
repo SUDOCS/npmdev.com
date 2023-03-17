@@ -5,4 +5,5 @@ export default defineAppletConfig({
   title: '个人简历',
   icon: 'dde-introduction',
   showInDock: false,
+  hidden: true,
 })
