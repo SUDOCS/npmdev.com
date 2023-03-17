@@ -50,7 +50,7 @@ function onPercentage(name: string, percentage: number) {
       <div py-xl>
         【{{ roomId }}】在线用户
       </div>
-      <div text-text-second text-sm border="~ dashed divider" p-2 bg-bg-a rounded-2>
+      <div max-w-180 mx-auto text-text-second text-sm border="~ dashed divider" p-2 bg-bg-a rounded-2>
         <span>
           WebSocket 连接状态{{ wsStatus === 'OPEN' ? '🟢' : '🔴' }}
         </span>

@@ -43,7 +43,7 @@ function sendMsg() {
 </script>
 
 <template>
-  <transition v-if="false" name="fade">
+  <transition name="fade">
     <SerialNumberOverlay
       v-model="roomId" :show="wsStatus !== 'OPEN'" title="匹配序列号" subtitle="输入6位数字"
       :loading="wsStatus === 'CONNECTING'" auto-generate :open="openWebsocket"
@@ -57,7 +57,7 @@ function sendMsg() {
           <div py-xl>
             【{{ roomId }}】在线用户
           </div>
-          <div text-text-second text-sm border="~ dashed divider" p-2 bg-bg-a rounded-2>
+          <div max-w-80 mx-auto text-text-second text-sm border="~ dashed divider" p-2 bg-bg-a rounded-2>
             <span>
               WebSocket 连接状态{{ wsStatus === 'OPEN' ? '🟢' : '🔴' }}
             </span>
