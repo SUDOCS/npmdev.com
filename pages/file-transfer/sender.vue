@@ -47,8 +47,19 @@ function onPercentage(name: string, percentage: number) {
 
   <div>
     <div w-80vw mx-auto text-center>
-      <div pt-xl>
-        {{ roomId }}，在线用户
+      <div py-xl>
+        【{{ roomId }}】在线用户
+      </div>
+      <div text-text-second text-sm border="~ dashed divider" p-2 bg-bg-a rounded-2>
+        <span>
+          WebSocket 连接状态{{ wsStatus === 'OPEN' ? '🟢' : '🔴' }}
+        </span>
+        <span>
+          WebRTC 连接状态{{ rtcStatus === 'connected' ? '🟢' : '🔴' }}
+        </span>
+        <span>
+          DataChannel 连接状态{{ dataChannelStatus === 'open' ? '🟢' : '🔴' }}
+        </span>
       </div>
       <div frow flex-wrap justify-center gap-xl py-xl>
         <div v-for="(userId, idx) in roomUserIds" :key="idx" fcol>
