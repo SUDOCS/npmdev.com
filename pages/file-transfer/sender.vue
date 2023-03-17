@@ -20,17 +20,14 @@ watch(roomUserIds, (ids) => {
   }
 })
 
-function onFileChange(e: Event) {
-  const fl = (e.target as HTMLInputElement).files
-  if (fl && Object.values(fl).length > 0) {
-    const file = Object.values(fl)[0]
-    sendFileWithRTC(file, onPercentage)
+function onFileChange(fl: FileList) {
+  const file = Object.values(fl)[0]
+  sendFileWithRTC(file, onPercentage)
 
-    if (!fileList.value.some(f => f.name === file.name)) {
-      // 新文件
-      percentages.value = { ...percentages.value, [file.name]: 0 }
-      fileList.value = [...fileList.value, file]
-    }
+  if (!fileList.value.some(f => f.name === file.name)) {
+    // 新文件
+    percentages.value = { ...percentages.value, [file.name]: 0 }
+    fileList.value = [...fileList.value, file]
   }
 }
 
@@ -55,23 +52,14 @@ function onPercentage(name: string, percentage: number) {
       </div>
       <div frow flex-wrap justify-center gap-xl py-xl>
         <div v-for="(userId, idx) in roomUserIds" :key="idx" fcol>
-          <div
-            w-16 h-16 lh-16 text-center bg-black:10 rounded="1/2" border="~ solid black"
-          >
-            {{ userId.toString().slice(0, 4) }}
-          </div>
+          <Avatar :name="userId.toString()" />
           <span>
             {{ userId === senderId ? '我' : '对方' }}
           </span>
         </div>
       </div>
 
-      <hr>
-
-      <div relative w-full mt-xl py-2 border="2px dashed black/60" rounded-xl>
-        <input type="file" absolute-full opacity-0 cursor-pointer @change="onFileChange">
-        <Icon name="fluent:add-20-filled" w-6 h-6 text-black:60 />
-      </div>
+      <Uploader :on-file-change="onFileChange" :disable="roomUserIds.length !== 2" />
 
       <div py-xl fcol gap-xs items-stretch>
         <div v-for="file in fileList" :key="file.name" text-left p-xs bg-black:10 rounded-xl frow justify-between relative overflow-hidden>

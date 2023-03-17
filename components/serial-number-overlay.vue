@@ -66,7 +66,7 @@ function start() {
       my-xl shadow transition flex-center
       :class="{
         'bg-black': serialVal.length === 6,
-        'bg-#a1a1e9': serialVal.length !== 6,
+        'bg-#5F5E6C': serialVal.length !== 6,
       }"
     >
       <loading-spinner v-if="loading" />

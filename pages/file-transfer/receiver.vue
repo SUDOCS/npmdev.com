@@ -57,18 +57,12 @@ function downloadFile(file: SliceFile) {
       </div>
       <div frow flex-wrap justify-center gap-xl py-xl>
         <div v-for="(userId, idx) in roomUserIds" :key="idx" fcol>
-          <div
-            w-16 h-16 lh-16 text-center bg-black:10 rounded="1/2" border="~ solid black"
-          >
-            {{ userId.toString().slice(0, 4) }}
-          </div>
+          <Avatar :name="userId.toString()" />
           <span>
             {{ userId === senderId ? '我' : '对方' }}
           </span>
         </div>
       </div>
-
-      <hr>
 
       <div py-xl fcol gap-xs items-stretch>
         <div v-for="file in fileList" :key="file.name" text-left p-xs bg-black:10 rounded-xl frow justify-between relative overflow-hidden>

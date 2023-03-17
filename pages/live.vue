@@ -59,11 +59,7 @@ function sendMsg() {
           </div>
           <div frow flex-wrap gap-xl py-xl items-center justify-center>
             <div v-for="(userId, idx) in roomUserIds" :key="idx" fcol>
-              <div
-                w-16 h-16 lh-16 text-center bg-avatar-bg rounded="1/2" border="~ divider solid"
-              >
-                {{ userId.toString().slice(0, 4) }}
-              </div>
+              <Avatar :name="userId.toString()" />
               <span>
                 {{ userId === senderId ? '我' : userId }}
               </span>
@@ -82,9 +78,7 @@ function sendMsg() {
         <!-- 成员 -->
         <div v-show="showMember" h-full overflow-y-auto>
           <div v-for="userId in roomUserIds" :key="userId" frow gap-xs px-3 py-2 border="~ divider b-solid">
-            <div rounded="1/2" w-12 h-12 lh-12 text-center bg-avatar-bg border="~ divider solid">
-              <span>{{ userId.toString().slice(0, 3) }}</span>
-            </div>
+            <Avatar :name="userId.toString()" :length="3" size="small" />
             <div>
               {{ userId }}
             </div>

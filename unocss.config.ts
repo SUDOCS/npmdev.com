@@ -11,7 +11,9 @@ export default defineConfig({
       primary: '#00AEEC',
       primaryHover: '#00B8F6',
       avatarBg: '#E5E8EE',
+      bgA: '#FAFAFC',
       divider: '#DDD',
+      textSecond: '#767C82',
     },
   },
   presets: [
