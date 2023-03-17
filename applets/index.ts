@@ -7,6 +7,7 @@ import Launcher from './launcher'
 import Live from './live'
 import Music from './music'
 import Posts from './posts'
+import Reader from './reader'
 import Resume from './resume'
 import Settings from './settings'
 import TrashBin from './trash-bin'
@@ -19,6 +20,7 @@ const AllApps = [
   Music,
   Album,
   Resume,
+  Reader,
   P2PFileTransfer,
   Live,
   Launcher,
