@@ -69,6 +69,8 @@ export function useMusicVisualizer(options: UseAudioMediaAnalyserOptions) {
       canvasContext.lineWidth = 2
       canvasContext.lineCap = 'round'
       canvasContext.strokeStyle = '#00AEEC'
+      canvasContext.shadowBlur = 5
+      canvasContext.shadowColor = '#00AEEC'
     }
   }
 
@@ -97,9 +99,9 @@ export function useMusicVisualizer(options: UseAudioMediaAnalyserOptions) {
 
     analyser?.getByteFrequencyData(frequencyData)
 
-    const { innerPointers, outerPointers } = calcInnerAndOuterPointers(frequencyData)
+    const { innerPointers, outerPointers, avg } = calcInnerAndOuterPointers(frequencyData)
 
-    renderAccrodingToStyle(innerPointers, outerPointers)
+    renderAccrodingToStyle(innerPointers, outerPointers, avg)
 
     setTimeout(() => {
       requestAnimationFrame(renderFrequency)
@@ -116,9 +118,11 @@ export function useMusicVisualizer(options: UseAudioMediaAnalyserOptions) {
 
     const angle = (Math.PI * 2) / data.length
 
+    const avg = buffer.reduce((acc, cur) => acc + cur, 0) / buffer.length / 256
+
     for (let i = 0; i < data.length; i++) {
       const value = Math.exp(data[i] / 255 * Math.log(2)) - 1
-      const innerRadius = radius - amplitude * 0.5 * value
+      const innerRadius = radius - amplitude * 1.0 * value
       const outerRadius = radius + amplitude * 1.0 * value
 
       const innerPointX = centerX + Math.cos(startAngle + i * angle) * innerRadius
@@ -133,6 +137,7 @@ export function useMusicVisualizer(options: UseAudioMediaAnalyserOptions) {
     return {
       innerPointers,
       outerPointers,
+      avg,
     }
   }
 
@@ -151,18 +156,18 @@ export function useMusicVisualizer(options: UseAudioMediaAnalyserOptions) {
     return innerRegion
   }
 
-  function renderAccrodingToStyle(innerPointers: number[], outerPointers: number[]) {
+  function renderAccrodingToStyle(innerPointers: number[], outerPointers: number[], avg: number) {
     switch (style.value) {
       case VisualizerStyle.OuterStrockInnerStrock:{
         renderOuterStrockInnerStroke(innerPointers, outerPointers)
         break
       }
       case VisualizerStyle.OuterStrockInnnerFill:{
-        renderOuterDotInnerFill(innerPointers, outerPointers)
+        renderOuterDotInnerFill(innerPointers, outerPointers, avg)
         break
       }
       case VisualizerStyle.OuterDotInnerStrock:{
-        renderOuterDotInnerStroke(innerPointers, outerPointers)
+        renderOuterDotInnerStroke(innerPointers, outerPointers, avg)
         break
       }
     }
@@ -192,53 +197,91 @@ export function useMusicVisualizer(options: UseAudioMediaAnalyserOptions) {
   }
 
   // 外圈描点，内圈填充
-  function renderOuterDotInnerFill(innerPointers: number[], outerPointers: number[]) {
+  function renderOuterDotInnerFill(innerPointers: number[], outerPointers: number[], avg: number) {
     if (!canvasContext)
       return
 
-    const innerRegion = createRegion(innerPointers)
+    const smallInnerPointers = []
+    const smallInnerRegion = new Path2D()
+    for (let i = 0; i < innerPointers.length; i += 2) {
+      const innerPointX = innerPointers[i]
+      const innerPointY = innerPointers[i + 1]
+
+      const smallInnerX = centerX + (innerPointX - centerX) * (avg + 0.1)
+      const smallInnerY = centerY + (innerPointY - centerY) * (avg + 0.1)
+
+      if (i === 0) {
+        smallInnerRegion.moveTo(smallInnerX, smallInnerY)
+      }
+      else {
+        smallInnerRegion.lineTo(smallInnerX, smallInnerY)
+      }
+
+      smallInnerPointers.push(smallInnerX, smallInnerY)
+    }
+    smallInnerRegion.closePath()
+
+    canvasContext.stroke(smallInnerRegion)
+
     const outerRegion = createRegion(outerPointers)
 
     canvasContext.stroke(outerRegion)
 
     const path = new Path2D()
     for (let i = 0; i < outerPointers.length - 2; i += 2) {
+      const smallInnerX = smallInnerPointers[i]
+      const smallInnerY = smallInnerPointers[i + 1]
       const outerPointX = outerPointers[i]
       const outerPointY = outerPointers[i + 1]
-      path.moveTo(centerX, centerY)
+      path.moveTo(smallInnerX, smallInnerY)
       path.lineTo(outerPointX, outerPointY)
     }
     canvasContext.stroke(path)
 
-    const gradient = getGradient(canvasContext)
+    const gradient = getGradient(canvasContext, radius * (avg + 0.1))
     canvasContext.fillStyle = gradient
-    canvasContext.fill(innerRegion)
+    canvasContext.fill(smallInnerRegion)
   }
 
   // 外圈描点，内圈描边
-  function renderOuterDotInnerStroke(innerPointers: number[], outerPointers: number[]) {
+  function renderOuterDotInnerStroke(innerPointers: number[], outerPointers: number[], avg: number) {
     if (!canvasContext)
       return
 
     const innerRegion = createRegion(innerPointers)
 
     const path = new Path2D()
-    for (let i = 0; i < outerPointers.length - 2; i += 2) {
+    const smallInnerRegion = new Path2D()
+
+    for (let i = 0; i < outerPointers.length; i += 2) {
+      const innerPointX = innerPointers[i]
+      const innerPointY = innerPointers[i + 1]
       const outerPointX = outerPointers[i]
       const outerPointY = outerPointers[i + 1]
-      path.moveTo(centerX, centerY)
+
+      const smallInnerX = centerX + (innerPointX - centerX) * (avg + 0.1)
+      const smallInnerY = centerY + (innerPointY - centerY) * (avg + 0.1)
+
+      path.moveTo(innerPointX, innerPointY)
       path.lineTo(outerPointX, outerPointY)
+
+      if (i === 0) {
+        smallInnerRegion.moveTo(smallInnerX, smallInnerY)
+      }
+      else {
+        smallInnerRegion.lineTo(smallInnerX, smallInnerY)
+      }
     }
-    canvasContext.lineWidth = 5
-    canvasContext.lineCap = 'round'
+
+    smallInnerRegion.closePath()
+
     canvasContext.stroke(path)
 
-    const gradient = getGradient(canvasContext)
-    canvasContext.fillStyle = gradient
-    canvasContext.fill(innerRegion)
+    canvasContext.stroke(innerRegion)
+    canvasContext.stroke(smallInnerRegion)
   }
 
-  function getGradient(context: CanvasRenderingContext2D) {
+  function getGradient(context: CanvasRenderingContext2D, radius: number) {
     const gradient = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius)
 
     gradient.addColorStop(1 / 5, '#15559a')
@@ -255,9 +298,9 @@ export function useMusicVisualizer(options: UseAudioMediaAnalyserOptions) {
       resetCanvas()
 
       const data = new Uint8Array(fftSize / 2).fill(0)
-      const { innerPointers, outerPointers } = calcInnerAndOuterPointers(data)
+      const { innerPointers, outerPointers, avg } = calcInnerAndOuterPointers(data)
 
-      renderAccrodingToStyle(innerPointers, outerPointers)
+      renderAccrodingToStyle(innerPointers, outerPointers, avg)
     }
   }
 
