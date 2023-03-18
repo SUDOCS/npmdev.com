@@ -71,8 +71,7 @@ function onRightClick(e: MouseEvent) {
   showContextMenu.value = true
 }
 
-function onDesktopClick(e: MouseEvent) {
-  e.preventDefault()
+function onDesktopClick() {
   showContextMenu.value = false
 }
 

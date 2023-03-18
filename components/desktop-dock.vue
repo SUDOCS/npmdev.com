@@ -54,7 +54,7 @@ const { mountApp } = appletStore
           </ClientOnly>
 
           <a text-13px href="https://beian.miit.gov.cn" target="_blank">
-            赣ICP备20000000号-1
+            赣ICP备2023000219号-1
           </a>
 
           <ClientOnly>
