@@ -5,7 +5,6 @@ export default defineAppletConfig({
   title: '音乐盒',
   icon: 'music',
   backgroundColor: '#EAEAEA',
-  enableMaximize: false,
   enableOpenInNewTab: false,
   windowWidth: '36vh',
   windowHeight: '64vh',

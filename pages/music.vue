@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import WaveSurfer from 'wavesurfer.js'
-const audioEle = ref<HTMLAudioElement>()
-const waveEle = ref<HTMLDivElement>()
-const groupActive = ref<'main' | 'upload' | 'detail'>('main')
+const groupActive = ref<'main' | 'upload'>('main')
 const files = shallowRef<File[]>([])
 
+const showPlayList = ref(false)
+
 const currentFile = shallowRef<File>()
+
+const canvasContainer = ref()
+const { playing, playOrPause, toggleStyle } = useMusicVisualizer({ fftSize: 64, canvasContainer })
 
 function onFileChange(fl: FileList) {
   const fileNames = files.value.map(f => f.name)
@@ -25,25 +27,13 @@ function onFileChange(fl: FileList) {
 
 onMounted(() => {
   if (files.value.length === 0) {
-    groupActive.value = 'upload'
+    groupActive.value = 'main'
   }
 })
 
-function play() {
+function togglePlayState() {
   if (currentFile.value) {
-    const wave = WaveSurfer.create({
-      container: waveEle.value,
-      waveColor: 'gray',
-      progressColor: 'black',
-      barWidth: 2,
-      barRadius: 2,
-      barGap: 1,
-    })
-
-    wave.on('ready', () => {
-      wave.play()
-    })
-    wave.load(URL.createObjectURL(currentFile.value))
+    playOrPause(currentFile.value)
   }
 }
 </script>
@@ -51,8 +41,8 @@ function play() {
 <template>
   <audio ref="audioEle" hidden />
   <TransitionGroup name="fade">
-    <div v-show="groupActive === 'upload'" key="music-upload" fixed inset-0 bg-white>
-      <div max-w-80vw mx-auto z-1 py-xl>
+    <div v-show="groupActive === 'upload'" key="music-upload" fixed inset-0>
+      <div max-w-80vw h-full mx-auto z-1 py-xl fcol justify-center items-stretch>
         <Uploader :on-file-change="onFileChange" accept="audio/*" multiple title="点击或拖拽上传本地音乐" />
 
         <div my-xl>
@@ -74,68 +64,80 @@ function play() {
       </div>
     </div>
 
-    <div v-show="groupActive === 'main'" key="music-main" w-full h-100vh bg-white fcol>
-      <div flex-1 w-full>
-        <h1 text-xl px-xl py-xs>
-          歌曲列表
-        </h1>
-        <hr border-divider border-none border-t-solid>
-        <div
-          v-for="file in files" :key="file.name"
-          border="~ b-solid divider" px-4 py-2 frow justify-between hover:bg-bg-b-hover transition
-          first-border-t-solid
-        >
-          <div>
-            {{ file.name }}
-          </div>
-          <div w-8 h-8 flex-center rounded="1/2" border="~ solid divider" text-4 cursor-pointer>
-            <Icon name="fluent:play-24-regular" />
-          </div>
+    <div v-show="groupActive === 'main'" key="music-main" w-full h-100vh fcol relative overflow-hidden>
+      <div w-full frow justify-between px-xl pt-xl>
+        <div w-10 h-10 flex-center bg-white rounded="1/2" border="~ solid divider" text-4 cursor-pointer @click="toggleStyle">
+          <!-- <Icon name="fluent:arrow-hook-up-left-24-regular" /> -->
+          <Icon name="fluent:style-guide-24-regular" />
         </div>
-        <div ref="waveEle" w-full />
-      </div>
-      <div w-full frow shadow border="~ t-solid divider" py-2 gap-2 px-4>
-        <div flex-1 cursor-pointer @click="groupActive = 'detail'">
+        <div>
           {{ currentFile?.name || '点击加号添加音乐' }}
         </div>
-        <div w-10 h-10 flex-center rounded="1/2" border="~ solid divider" text-5 cursor-pointer @click="play">
-          <Icon name="fluent:play-24-regular" />
-        </div>
-        <div w-10 h-10 flex-center rounded="1/2" border="~ solid divider" text-5 cursor-pointer @click="groupActive = 'upload'">
+        <div
+          w-10 h-10 flex-center bg-white rounded="1/2" border="~ solid divider" text-4 cursor-pointer
+          @click="groupActive = 'upload'"
+        >
           <Icon name="fluent:add-24-regular" />
         </div>
       </div>
-    </div>
 
-    <div v-show="groupActive === 'detail'" key="music-main" fixed w-full h-100vh bg-white fcol items-stretch>
-      <div frow justify-between px-xl pt-xl>
-        <div bg-bg-c p-xs rounded="1/2" cursor-pointer @click="groupActive = 'main'">
-          <Icon name="fluent:arrow-hook-up-left-24-regular" w-6 h-6 text-text-second />
+      <div ref="canvasContainer" text-center w-full h-60vh overflow-hidden />
+
+      <!-- controls -->
+      <div frow justify-center gap-xl py-xl>
+        <div w-12 h-12 flex-center bg-white rounded="1/2" cursor-pointer>
+          <Icon name="fluent:previous-24-regular" />
         </div>
-        <div>
-          {{ currentFile?.name }}
+        <div w-15 h-15 flex-center bg-white rounded="1/2" cursor-pointer @click="togglePlayState">
+          <Icon v-show="!playing" name="fluent:play-24-regular" />
+          <Icon v-show="playing" name="fluent:pause-24-regular" />
         </div>
-        <div bg-bg-c p-xs rounded="1/2" cursor-pointer @click="groupActive = 'upload'">
-          <Icon name="fluent:add-24-regular" w-6 h-6 text-text-second />
+        <div w-12 h-12 flex-center bg-white rounded="1/2" cursor-pointer>
+          <Icon name="fluent:next-24-regular" />
         </div>
       </div>
-      <!--  -->
 
-      <div flex-1 w-full>
-        <!-- 频谱 -->
-      </div>
-
-      <div frow justify-center gap-xl py-xs>
-        <div p-2 rounded="1/2" bg-black text-white cursor-pointer>
-          <Icon name="fluent:previous-24-regular" w-6 h-6 />
+      <div fixed bottom-0 w-full shadow border="~ t-solid divider">
+        <!-- 歌单 -->
+        <div
+          absolute top-0 left-0 right-0 z-0 bg-white transition="transform ease-out" border="~ t-solid divider"
+          :class="{ 'translate-y-0': !showPlayList, 'translate-y--100%': showPlayList }"
+        >
+          <div v-if="files.length !== 0">
+            <div
+              v-for="file in files" :key="file.name"
+              border="~ b-solid divider" px-4 py-2 frow justify-between hover:bg-bg-b-hover transition
+            >
+              <div>
+                {{ file.name }}
+              </div>
+              <div w-8 h-8 flex-center rounded="1/2" border="~ solid divider" text-4 cursor-pointer>
+                <Icon name="fluent:play-24-regular" />
+              </div>
+            </div>
+          </div>
+          <div v-else px-xl py-xs>
+            暂无歌曲
+          </div>
         </div>
 
-        <div p-xs rounded="1/2" bg-black text-white cursor-pointer>
-          <Icon name="fluent:play-24-regular" w-8 h-8 />
-          <!-- <Icon name="fluent:pause-24-regular" /> -->
-        </div>
-        <div p-2 rounded="1/2" bg-black text-white cursor-pointer>
-          <Icon name="fluent:next-24-regular" w-6 h-6 />
+        <div frow py-2 gap-2 px-4 relative z-2 bg-white>
+          <div
+            w-10 h-10 flex-center rounded="1/2" border="~ solid divider" text-5 cursor-pointer
+            @click="togglePlayState"
+          >
+            <Icon v-show="!playing" name="fluent:play-24-regular" />
+            <Icon v-show="playing" name="fluent:pause-24-regular" />
+          </div>
+          <div flex-1 cursor-pointer>
+            {{ currentFile?.name || '点击加号添加音乐' }}
+          </div>
+          <div
+            w-10 h-10 flex-center rounded="1/2" border="~ solid divider" text-5 cursor-pointer
+            @click="showPlayList = !showPlayList"
+          >
+            <Icon name="fluent:apps-list-detail-24-regular" />
+          </div>
         </div>
       </div>
     </div>

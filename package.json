@@ -13,9 +13,6 @@
     "tgz": "esno ./scripts/tgz.ts",
     "cwebp": "esno ./scripts/cwebp.ts"
   },
-  "dependencies": {
-    "wavesurfer.js": "^6.6.0"
-  },
   "devDependencies": {
     "@antfu/eslint-config": "^0.36.0",
     "@commitlint/cli": "^17.4.4",
