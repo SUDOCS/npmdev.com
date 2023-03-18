@@ -29,6 +29,7 @@ export default defineNuxtConfig({
     '/file-transfer/*': { ssr: false }, /* 一个*，不包括index，但包含 sender 和 receiver */
     '/live': { ssr: false },
     '/music': { ssr: false },
+    '/reader': { ssr: false },
   },
   vite: {
     css: {
