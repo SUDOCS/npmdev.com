@@ -4,7 +4,7 @@ import * as pdfViewer from 'pdfjs-dist/web/pdf_viewer'
 
 import 'pdfjs-dist/web/pdf_viewer.css'
 
-pdfLib.GlobalWorkerOptions.workerSrc = '//unpkg.com/browse/pdfjs-dist@3.4.120/lib/pdf.worker.js'
+pdfLib.GlobalWorkerOptions.workerSrc = '//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js'
 
 const pdfContainer = ref()
 

@@ -34,7 +34,7 @@ enum WindowAction {
   Close,
 }
 
-const state = ref(WindowState.Normal)
+const state = ref(props.config.defaultMaximized ? WindowState.Maximized : WindowState.Normal)
 const oldState = ref(WindowState.Normal)
 const iframeLoaded = ref(false)
 

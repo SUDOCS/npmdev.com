@@ -14,6 +14,9 @@ export interface AppletConfig {
   /* 允许最大化 */
   enableMaximize?: boolean
   /* 窗口背景颜色 */
+
+  defaultMaximized?: boolean
+
   backgroundColor?: string
   /* 自定义窗口标题栏，但是图标和按钮依旧会存在 */
   customTitleBar?: boolean
@@ -45,6 +48,7 @@ export const defaultAppleatConfig: Partial<AppletConfig> = {
   enableOpenInNewTab: true,
   enableMinimize: true,
   enableMaximize: true,
+  defaultMaximized: false,
   customTitleBar: false,
   dockArea: 'center',
   showInDesktop: true,
