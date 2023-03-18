@@ -273,7 +273,8 @@ function openNewTab() {
       <Transition name="fade">
         <div
           v-if="!iframeLoaded"
-          absolute-full flex-center bg-white :class="{ 'rounded-xl': config.customTitleBar && isLargeScreen }"
+          absolute-full flex-center :style="{ backgroundColor: config.backgroundColor || 'white' }"
+          :class="{ 'rounded-xl': config.customTitleBar && isLargeScreen }"
         >
           <img :src="config.icon" class="splash-icon">
         </div>
