@@ -1,53 +1,53 @@
 <script setup lang="ts">
+import type { MusicFile } from '~~/utils/music'
+
 const groupActive = ref<'main' | 'upload'>('main')
-const files = shallowRef<File[]>([])
-
 const showPlayList = ref(false)
-
-const currentFile = shallowRef<File>()
-
+const playList = shallowRef<MusicFile[]>([])
 const canvasContainer = ref()
-const { playing, playOrPause, toggleStyle } = useMusicVisualizer({ fftSize: 64, canvasContainer })
+
+const { playing, currentFile, playOrPause, toggleStyle, nextMusic, prevMusic, startPlayFile } = useMusicVisualizer({ fftSize: 64, canvasContainer, playList })
 
 function onFileChange(fl: FileList) {
-  const fileNames = files.value.map(f => f.name)
+  const fileNames = playList.value
+    .filter(f => f.origin === MusicFileOrigin.Local)
+    .map(f => f.name)
+
   for (let i = 0; i < fl.length; i++) {
     const file = Object.values(fl)[i]
 
     if (!fileNames.includes(file.name)) {
     // 新文件
-      files.value = [...files.value, file]
+      const musicFile = new LocalMusicFile(file)
+      playList.value = [...playList.value, musicFile]
     }
-  }
-
-  if (currentFile.value === undefined) {
-    currentFile.value = files.value[0]
   }
 }
 
 onMounted(() => {
-  if (files.value.length === 0) {
-    groupActive.value = 'main'
-  }
+  // https://api.oick.cn/wyy/api.php?id=785902
+  playList.value = [
+    new NetworkMusicFile(
+      '雲流れ - みかん箱,Foxtail-Grass Studio',
+      'https://npmdev.oss-cn-hangzhou.aliyuncs.com/%E9%9B%B2%E6%B5%81%E3%82%8C%20-%20%E3%81%BF%E3%81%8B%E3%82%93%E7%AE%B1%2CFoxtail-Grass%20Studio.mp3',
+    ),
+    new NetworkMusicFile(
+      '初心-潘辰',
+      'https://npmdev.oss-cn-hangzhou.aliyuncs.com/%E5%88%9D%E5%BF%83-%E6%BD%98%E8%BE%B0.128.mp3',
+    ),
+  ]
 })
-
-function togglePlayState() {
-  if (currentFile.value) {
-    playOrPause(currentFile.value)
-  }
-}
 </script>
 
 <template>
-  <audio ref="audioEle" hidden />
   <TransitionGroup name="fade">
-    <div v-show="groupActive === 'upload'" key="music-upload" fixed inset-0>
+    <div v-show="groupActive === 'upload'" key="music-upload" fixed inset-0 select-none>
       <div max-w-80vw h-full mx-auto z-1 py-xl fcol justify-center items-stretch>
         <Uploader :on-file-change="onFileChange" accept="audio/*" multiple title="点击或拖拽上传本地音乐" />
 
         <div my-xl>
           <div
-            v-for="file in files" :key="file.name"
+            v-for="file in playList" :key="file.name"
             py-sm px-xl bg-bg-b mb-xl rounded-xl hover:bg-bg-b-hover transition cursor-pointer
           >
             {{ file.name }}
@@ -64,10 +64,9 @@ function togglePlayState() {
       </div>
     </div>
 
-    <div v-show="groupActive === 'main'" key="music-main" w-full h-100vh fcol relative overflow-hidden>
+    <div v-show="groupActive === 'main'" key="music-main" w-full h-100vh fcol relative overflow-hidden select-none @click="showPlayList = false">
       <div w-full frow justify-between px-xl pt-xl>
         <div w-10 h-10 flex-center bg-white rounded="1/2" border="~ solid divider" text-4 cursor-pointer @click="toggleStyle">
-          <!-- <Icon name="fluent:arrow-hook-up-left-24-regular" /> -->
           <Icon name="fluent:style-guide-24-regular" />
         </div>
         <div>
@@ -85,14 +84,14 @@ function togglePlayState() {
 
       <!-- controls -->
       <div frow justify-center gap-xl py-xl>
-        <div w-12 h-12 flex-center bg-white rounded="1/2" cursor-pointer>
+        <div w-12 h-12 flex-center bg-white rounded="1/2" cursor-pointer @click="prevMusic">
           <Icon name="fluent:previous-24-regular" />
         </div>
-        <div w-15 h-15 flex-center bg-white rounded="1/2" cursor-pointer @click="togglePlayState">
+        <div w-15 h-15 flex-center bg-white rounded="1/2" cursor-pointer @click="playOrPause">
           <Icon v-show="!playing" name="fluent:play-24-regular" />
           <Icon v-show="playing" name="fluent:pause-24-regular" />
         </div>
-        <div w-12 h-12 flex-center bg-white rounded="1/2" cursor-pointer>
+        <div w-12 h-12 flex-center bg-white rounded="1/2" cursor-pointer @click="nextMusic">
           <Icon name="fluent:next-24-regular" />
         </div>
       </div>
@@ -103,15 +102,18 @@ function togglePlayState() {
           absolute top-0 left-0 right-0 z-0 bg-white transition="transform ease-out" border="~ t-solid divider"
           :class="{ 'translate-y-0': !showPlayList, 'translate-y--100%': showPlayList }"
         >
-          <div v-if="files.length !== 0">
+          <div v-if="playList.length !== 0">
             <div
-              v-for="file in files" :key="file.name"
-              border="~ b-solid divider" px-4 py-2 frow justify-between hover:bg-bg-b-hover transition
+              v-for="(file, idx) in playList" :key="file.name"
+              border="~ b-solid divider" px-4 py-2 frow justify-between
             >
               <div>
                 {{ file.name }}
               </div>
-              <div w-8 h-8 flex-center rounded="1/2" border="~ solid divider" text-4 cursor-pointer>
+              <div
+                w-8 h-8 flex-center rounded="1/2" border="~ solid divider" hover:bg-bg-b-hover transition text-4 cursor-pointer
+                @click="startPlayFile(idx)"
+              >
                 <Icon name="fluent:play-24-regular" />
               </div>
             </div>
@@ -124,7 +126,7 @@ function togglePlayState() {
         <div frow py-2 gap-2 px-4 relative z-2 bg-white>
           <div
             w-10 h-10 flex-center rounded="1/2" border="~ solid divider" text-5 cursor-pointer
-            @click="togglePlayState"
+            @click="playOrPause"
           >
             <Icon v-show="!playing" name="fluent:play-24-regular" />
             <Icon v-show="playing" name="fluent:pause-24-regular" />
@@ -134,7 +136,7 @@ function togglePlayState() {
           </div>
           <div
             w-10 h-10 flex-center rounded="1/2" border="~ solid divider" text-5 cursor-pointer
-            @click="showPlayList = !showPlayList"
+            @click.stop="showPlayList = !showPlayList"
           >
             <Icon name="fluent:apps-list-detail-24-regular" />
           </div>

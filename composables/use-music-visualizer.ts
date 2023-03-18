@@ -1,6 +1,8 @@
+import type { MusicFile } from './../utils/music'
 export interface UseAudioMediaAnalyserOptions {
   fftSize: number
   canvasContainer: Ref<HTMLDivElement>
+  playList: Ref<MusicFile[]>
 }
 
 enum VisualizerStyle {
@@ -10,7 +12,7 @@ enum VisualizerStyle {
 }
 
 export function useMusicVisualizer(options: UseAudioMediaAnalyserOptions) {
-  const { fftSize, canvasContainer } = options
+  const { fftSize, canvasContainer, playList } = options
 
   const { width, height } = useElementSize(canvasContainer)
 
@@ -41,36 +43,6 @@ export function useMusicVisualizer(options: UseAudioMediaAnalyserOptions) {
   const style = ref<VisualizerStyle>(VisualizerStyle.OuterStrockInnerStrock)
 
   let rotateInterval: NodeJS.Timeout | undefined
-
-  watch([width, height], ([w, h]) => {
-    centerX = w / 2
-    centerY = h / 2
-    radius = Math.min(w, h) / 2 * 0.7
-
-    if (!playing.value) {
-      console.log(w, h)
-      drawDemo()
-    }
-  })
-
-  watch(style, () => {
-    if (!playing.value) {
-      drawDemo()
-    }
-  })
-
-  watch(playing, (val) => {
-    if (val) {
-      rotateInterval = setInterval(() => {
-        startAngle += Math.PI * 2 / frequencyData.length / 60
-      }, 1000 / 60)
-
-      renderFrequency()
-    }
-    else {
-      rotateInterval && clearInterval(rotateInterval as NodeJS.Timeout)
-    }
-  })
 
   function initCanvas() {
     canvasEle = document.createElement('canvas')
@@ -289,27 +261,62 @@ export function useMusicVisualizer(options: UseAudioMediaAnalyserOptions) {
     }
   }
 
-  function createAudioAndPlay(file: File) {
+  const currentFileIdx = ref(0)
+  const currentFile = computed(() => playList.value[currentFileIdx.value])
+
+  watch([width, height], ([w, h]) => {
+    centerX = w / 2
+    centerY = h / 2
+    radius = Math.min(w, h) / 2 * 0.7
+
+    if (!playing.value) {
+      console.log(w, h)
+      drawDemo()
+    }
+  })
+
+  watch(style, () => {
+    if (!playing.value) {
+      drawDemo()
+    }
+  })
+
+  watch(playing, (val) => {
+    if (val) {
+      rotateInterval = setInterval(() => {
+        startAngle += Math.PI * 2 / frequencyData.length / 60
+      }, 1000 / 60)
+
+      renderFrequency()
+    }
+    else {
+      rotateInterval && clearInterval(rotateInterval as NodeJS.Timeout)
+    }
+  })
+
+  function createAudioAndPlay(file: MusicFile) {
     audio = new Audio()
-    audio.src = URL.createObjectURL(file)
+    audio.crossOrigin = 'anonymous'
+    audio.src = file.url
 
     audio.onplay = () => {
-      console.log('onplay')
       playing.value = true
     }
 
     audio.onended = () => {
-      console.log('onended')
       playing.value = false
-
-      destroyAudio()
+      currentFileIdx.value = (currentFileIdx.value + 1) % playList.value.length
     }
 
     initAudioMediaAnalyser(audio)
     audio.play()
   }
 
-  function playOrPause(file: File) {
+  function playOrPause() {
+    if (playList.value.length === 0) {
+      return
+    }
+
     if (playing.value) {
       audio?.pause()
     }
@@ -318,11 +325,23 @@ export function useMusicVisualizer(options: UseAudioMediaAnalyserOptions) {
         audio.play()
       }
       else {
-        createAudioAndPlay(file)
+        startPlayFile(currentFileIdx.value)
       }
     }
 
     playing.value = !playing.value
+  }
+
+  watch(currentFileIdx, (newIdx) => {
+    startPlayFile(newIdx)
+  })
+
+  function startPlayFile(fileIdx: number) {
+    playing.value = false // 先令渲染停止，后续会被 onplay 事件设置为 true
+    destroyAudio()
+    const file = playList.value[fileIdx]
+    createAudioAndPlay(file)
+    currentFileIdx.value = fileIdx
   }
 
   function toggleStyle() {
@@ -338,10 +357,17 @@ export function useMusicVisualizer(options: UseAudioMediaAnalyserOptions) {
     audio = undefined
   }
 
+  function prevMusic() {
+    currentFileIdx.value = (currentFileIdx.value - 1 + playList.value.length) % playList.value.length
+  }
+
+  function nextMusic() {
+    currentFileIdx.value = (currentFileIdx.value + 1) % playList.value.length
+  }
+
   onMounted(() => {
     initCanvas()
 
-    console.log(canvasContainer.value)
     // 挂载 canvas
     canvasContainer.value.innerHTML = ''
     canvasContainer.value.appendChild(canvasEle!)
@@ -349,10 +375,18 @@ export function useMusicVisualizer(options: UseAudioMediaAnalyserOptions) {
     drawDemo()
   })
 
+  onUnmounted(() => {
+    destroyAudio()
+  })
+
   return {
     audioContext,
     playing,
+    currentFile,
     playOrPause,
     toggleStyle,
+    startPlayFile,
+    prevMusic,
+    nextMusic,
   }
 }
