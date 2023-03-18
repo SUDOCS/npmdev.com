@@ -40,7 +40,7 @@ const { randomWallpaper } = storeToRefs(wallpaperStore)
       inline-block bg-white rounded-xl p-xl shadow-xl flex-1
       min-w-full lg:min-w-120
     >
-      <table w-full text-sm>
+      <table w-full>
         <tbody>
           <tr>
             <td>名称</td>
@@ -78,8 +78,8 @@ const { randomWallpaper } = storeToRefs(wallpaperStore)
       <div text-center>
         使用说明
       </div>
-      <p text-sm>
-        桌面支持右键菜单，双击桌面图标打开应用，可最大化最小化应用窗口，并且可拖动应用窗口。
+      <p>
+        双击桌面图标打开应用，可最大化最小化应用窗口，窗口支持拖动。
         更多功能开发中……
       </p>
     </div>
