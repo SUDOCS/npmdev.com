@@ -30,6 +30,7 @@ export default defineNuxtConfig({
     '/live': { ssr: false },
     '/music': { ssr: false },
     '/reader': { ssr: false },
+    '/proxy/youdao/**': { proxy: 'http://fanyi.youdao.com/**' },
   },
   vite: {
     css: {
@@ -101,18 +102,18 @@ export default defineNuxtConfig({
         algorithm: 'brotliCompress',
       }),
     ],
-    server: {
-      proxy: {
-        '/youdao': {
-          target: 'http://fanyi.youdao.com',
-          rewrite(path) {
-            return path.replace(/^\/youdao/, '/translate')
-          },
-          changeOrigin: true,
-          secure: false,
-        },
-      },
-    },
+    // server: {
+    //   proxy: {
+    //     '/youdao': {
+    //       target: 'http://fanyi.youdao.com',
+    //       rewrite(path) {
+    //         return path.replace(/^\/youdao/, '/translate')
+    //       },
+    //       changeOrigin: true,
+    //       secure: false,
+    //     },
+    //   },
+    // },
   },
   css: [
     '@/assets/common.scss',

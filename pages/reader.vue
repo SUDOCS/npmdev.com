@@ -60,7 +60,7 @@ async function renderPDF() {
 async function fetchTransitionResult() {
   showTranslation.value = false
   const encode = encodeURIComponent(selectedText.value)
-  url.value = `/youdao?&doctype=json&type=AUTO&i=${encode}`
+  url.value = `/proxy/youdao/translate?&doctype=json&type=AUTO&i=${encode}`
   await execute()
 
   console.log(data.value)
