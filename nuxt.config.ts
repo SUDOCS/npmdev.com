@@ -31,6 +31,7 @@ export default defineNuxtConfig({
     '/music': { ssr: false },
     '/reader': { ssr: false },
     '/proxy/youdao/**': { proxy: 'http://fanyi.youdao.com/**' },
+    '/proxy/pan/**': { proxy: 'http://pan.npmdev.com/**' },
   },
   vite: {
     css: {

@@ -1,61 +1,69 @@
 <script setup lang="ts">
-import driverSvg from '@/assets/icons/apps/drive-network.svg?inline'
+import desktopFolderSvg from '@/assets/icons/places/folder-desktop.svg?inline'
+import documentFolderSvg from '@/assets/icons/places/folder-documents.svg?inline'
+import musicFolderSvg from '@/assets/icons/places/folder-music.svg?inline'
+import picturesFolderSvg from '@/assets/icons/places/folder-pictures.svg?inline'
+import videoFolderSvg from '@/assets/icons/places/folder-videos.svg?inline'
 </script>
 
 <template>
+  <ExplorerNavigation />
+
   <div class="explorer-entry-list">
-    <div class="explorer-entry">
-      <img :src="driverSvg" alt="">
+    <NuxtLink class="explorer-entry" to="/explorer/desktop">
+      <img :src="desktopFolderSvg" alt="">
       <div class="explorer-entry-space-detail">
-        <div>阿里云</div>
-        <progress class="explorer-entry-space-bar" value="10" max="100" />
-        <div>
-          <span>已用 1.2GB</span>
-          <span> / </span>
-          <span>总容量 2.0GB</span>
-        </div>
+        <div>桌面</div>
       </div>
-    </div>
-    <div class="explorer-entry">
-      <img :src="driverSvg" alt="">
+    </NuxtLink>
+
+    <NuxtLink class="explorer-entry" to="/explorer/musics">
+      <img :src="musicFolderSvg" alt="">
       <div class="explorer-entry-space-detail">
-        <div>腾讯云</div>
-        <progress class="explorer-entry-space-bar" value="10" max="100" />
-        <div>
-          <span>已用 1.2GB</span>
-          <span> / </span>
-          <span>总容量 2.0GB</span>
-        </div>
+        <div>音乐</div>
       </div>
-    </div>
-    <div v-for="x in 5" :key="x" class="explorer-entry">
-      <img :src="driverSvg" alt="">
+    </NuxtLink>
+
+    <NuxtLink class="explorer-entry" to="/explorer/pictures">
+      <img :src="picturesFolderSvg" alt="">
       <div class="explorer-entry-space-detail">
-        <div>AWS S3</div>
-        <progress class="explorer-entry-space-bar" :value="Math.random() * 100" max="100" />
-        <div>
-          <span>已用 1.2GB</span>
-          <span> / </span>
-          <span>总容量 2.0GB</span>
-        </div>
+        <div>图片</div>
       </div>
-    </div>
+    </NuxtLink>
+
+    <NuxtLink class="explorer-entry" to="/explorer/videos">
+      <img :src="videoFolderSvg" alt="">
+      <div class="explorer-entry-space-detail">
+        <div>视频</div>
+      </div>
+    </NuxtLink>
+
+    <NuxtLink class="explorer-entry" to="/explorer/documents">
+      <img :src="documentFolderSvg" alt="">
+      <div class="explorer-entry-space-detail">
+        <div>文档</div>
+      </div>
+    </NuxtLink>
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .explorer-entry-list{
     @apply gap-4 p-xl grid
-    grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4
-    2xl:grid-cols-5;
+    grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8
+    2xl:grid-cols-10;
 }
 .explorer-entry{
-    @apply h-20 rounded-xl
-    frow text-sm cursor-pointer border border-solid border-divider
+    @apply rounded-xl p-xl
+    fcol text-sm cursor-pointer border border-solid border-divider
     hover:bg-black/5 transition-colors duration-300;
 
+    img{
+        @apply w-32 h-32;
+    }
+
     &-space-detail{
-        @apply flex-1 fcol justify-center items-start pr-xl;
+        @apply flex-1 flex-center;
     }
 
     &-space-bar{
@@ -68,10 +76,6 @@ import driverSvg from '@/assets/icons/apps/drive-network.svg?inline'
         &::-webkit-progress-value{
             @apply bg-primary;
         }
-    }
-
-    img{
-        @apply w-16 h-16 mx-4;
     }
 }
 </style>
