@@ -101,6 +101,18 @@ export default defineNuxtConfig({
         algorithm: 'brotliCompress',
       }),
     ],
+    server: {
+      proxy: {
+        '/youdao': {
+          target: 'http://fanyi.youdao.com',
+          rewrite(path) {
+            return path.replace(/^\/youdao/, '/translate')
+          },
+          changeOrigin: true,
+          secure: false,
+        },
+      },
+    },
   },
   css: [
     '@/assets/common.scss',
