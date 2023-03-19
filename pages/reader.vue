@@ -12,6 +12,8 @@ const file = shallowRef<File>()
 
 console.log(pdfViewer)
 const eventBus = new pdfViewer.EventBus()
+const pageViews: pdfViewer.PDFPageView[] = []
+const scale = ref(100)
 
 const { text: selectedText, rects: selectedRects, ranges: selectedRanges } = useTextSelection()
 const showPopup = ref(false)
@@ -34,6 +36,20 @@ watch(file, (val) => {
   if (val) {
     renderPDF()
   }
+  else {
+    pageViews.forEach((pageView) => {
+      pageView.destroy()
+    })
+    pageViews.splice(0, pageViews.length)
+    pdfContainer.value.innerHTML = ''
+  }
+})
+
+watch(scale, (val) => {
+  pageViews.forEach((pageView) => {
+    pageView.update({ scale: val / 100 })
+    pageView.draw()
+  })
 })
 
 async function renderPDF() {
@@ -43,17 +59,18 @@ async function renderPDF() {
     const page = await pdf.getPage(i)
 
     console.log(page)
-    const scale = 1.5
     const pdfPageView = new pdfViewer.PDFPageView({
       container: pdfContainer.value,
       id: i,
-      scale,
-      defaultViewport: page.getViewport({ scale }),
+      scale: scale.value / 100,
+      defaultViewport: page.getViewport({ scale: scale.value / 100 }),
       eventBus,
     })
 
     pdfPageView.setPdfPage(page)
     pdfPageView.draw()
+
+    pageViews.push(pdfPageView)
   }
 }
 
@@ -95,6 +112,14 @@ const onSelectionChangeDebounced = useDebounceFn(onSelectionChange, 500)
 watch(selectedText, () => {
   onSelectionChangeDebounced()
 })
+
+function zoomIn() {
+  scale.value += 10
+}
+
+function zoomOut() {
+  scale.value -= 10
+}
 </script>
 
 <template>
@@ -106,7 +131,48 @@ watch(selectedText, () => {
       />
     </div>
   </Transition>
-  <div ref="pdfContainer" w-full h-100vh frow justify-center gap-xs flex-wrap relative />
+
+  <div fixed h-12 w-full border="~ divider b-solid" frow justify-between px-xl z-999 bg-white>
+    <!-- 控件 -->
+    <div>
+      <div w-8 h-8 rounded="1/2" flex-center border="~ divider solid" cursor-pointer hover:bg-bg-b-hover>
+        <Icon name="fluent:panel-left-24-regular" />
+      </div>
+    </div>
+    <div text-center frow>
+      <div px-xl>
+        {{ file?.name }}
+      </div>
+      <div
+        w-8 h-8 rounded="1/2" flex-center cursor-pointer hover:bg-bg-b-hover
+        @click="zoomOut"
+      >
+        <Icon name="fluent:subtract-24-regular" />
+      </div>
+      <div px-xl mx-1 bg-bg-b>
+        {{ scale }}%
+      </div>
+      <div
+        w-8 h-8 rounded="1/2" flex-center cursor-pointer hover:bg-bg-b-hover
+        @click="zoomIn"
+      >
+        <Icon name="fluent:add-24-regular" />
+      </div>
+    </div>
+    <div>
+      <div
+        w-8 h-8 rounded="1/2" flex-center border="~ divider solid" cursor-pointer hover:bg-bg-b-hover
+        @click="file = undefined"
+      >
+        <Icon name="fluent:calendar-cancel-24-regular" />
+      </div>
+    </div>
+  </div>
+
+  <!-- 占位置 -->
+  <div h-12 w-full />
+
+  <div ref="pdfContainer" w-full frow justify-center gap-xs flex-wrap relative />
 
   <div
     v-show="showPopup" fixed translate-x="-1/2" translate-y="-1/1" bg-white rounded-xl shadow
@@ -127,5 +193,9 @@ watch(selectedText, () => {
 <style lang="scss" scoped>
 :deep(.page){
   @apply relative;
+}
+
+:deep(.textLayer span, .textLayer br){
+  // color: black;
 }
 </style>
