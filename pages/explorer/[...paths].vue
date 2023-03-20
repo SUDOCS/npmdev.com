@@ -15,15 +15,18 @@ definePageMeta({
 })
 
 const route = useRoute()
+const paths = computed(() => {
+  return route.params.paths as string[]
+})
 
 const explorerStore = useExplorerStore()
 const { listStyle } = storeToRefs(explorerStore)
 
-const path = computed(() => {
-  return `/proxy/pan/api/v3/share/list/P4Cq/${(route.params.dirs as string[]).join('/')}`
+const requestUrl = computed(() => {
+  return `/proxy/pan/api/v3/share/list/P4Cq/${paths.value.join('/')}`
 })
 
-const { data: dirData } = await useFetch(path)
+const { data: dirData } = await useFetch(requestUrl)
 
 const files = computed(() => {
   const { code, data } = dirData.value as any
@@ -65,7 +68,10 @@ function icon(filename: string) {
       'explorer-entry-list-detail': listStyle === 'detail',
     }"
   >
-    <NuxtLink v-for="file in files" :key="file.id" class="explorer-entry" to="/explorer/desktop">
+    <NuxtLink
+      v-for="file in files" :key="file.id" class="explorer-entry"
+      :to="file.type === 'file' ? `/explorer/preview/${paths.join('/')}/${file.name}` : `/explorer/${paths.join('/')}/${file.name}`"
+    >
       <img :src="icon(file.name)" alt="">
       <div class="explorer-entry-space-detail">
         <div>{{ file.name }}</div>
