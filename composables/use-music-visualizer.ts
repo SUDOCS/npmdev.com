@@ -2,7 +2,6 @@ import type { MusicFile } from './../utils/music'
 export interface UseAudioMediaAnalyserOptions {
   fftSize: number
   canvasContainer: Ref<HTMLDivElement>
-  playList: Ref<MusicFile[]>
 }
 
 enum VisualizerStyle {
@@ -12,7 +11,9 @@ enum VisualizerStyle {
 }
 
 export function useMusicVisualizer(options: UseAudioMediaAnalyserOptions) {
-  const { fftSize, canvasContainer, playList } = options
+  const { fftSize, canvasContainer } = options
+
+  const { playList, currentFile, currentFileIdx } = storeToRefs(useMusicStore())
 
   const { width, height } = useElementSize(canvasContainer)
 
@@ -303,9 +304,6 @@ export function useMusicVisualizer(options: UseAudioMediaAnalyserOptions) {
       renderAccrodingToStyle(innerPointers, outerPointers, avg)
     }
   }
-
-  const currentFileIdx = ref(0)
-  const currentFile = computed(() => playList.value[currentFileIdx.value])
 
   watch([width, height], ([w, h]) => {
     centerX = w / 2

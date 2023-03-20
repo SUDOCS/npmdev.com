@@ -6,7 +6,7 @@ import zipSvg from '@/assets/icons/mimetypes/application-zip.svg?inline'
 import imageSvg from '@/assets/icons/mimetypes/image.svg?inline'
 import txtSvg from '@/assets/icons/mimetypes/text-plain.svg?inline'
 import unknownSvg from '@/assets/icons/mimetypes/unknown.svg?inline'
-
+import folderSvg from '@/assets/icons/places/folder.svg?inline'
 import emptyIllustration from '@/assets/illustrations/empty.svg?inline'
 
 definePageMeta({
@@ -15,6 +15,7 @@ definePageMeta({
 })
 
 const route = useRoute()
+const router = useRouter()
 const paths = computed(() => {
   return route.params.paths as string[]
 })
@@ -36,8 +37,16 @@ const files = computed(() => {
   }
 })
 
-function icon(filename: string) {
-  const ext = filename.split('.').pop()
+const musicFiles = computed(() => {
+  return files.value.filter((file: Record<string, any>) => file.type === 'file' && file.name.split('.').pop() === 'mp3')
+})
+
+function icon(file: Record<string, any>) {
+  if (file.type === 'dir') {
+    return folderSvg
+  }
+
+  const ext = file.name.split('.').pop()
   switch (ext) {
     case 'mp3':
       return mp3Svg
@@ -59,6 +68,39 @@ function icon(filename: string) {
       return unknownSvg
   }
 }
+
+function onFileClick(file: Record<string, any>) {
+  const to = `${paths.value.join('/')}/${file.name}`
+  if (file.type === 'file') {
+    const ext = file.name.split('.').pop()
+
+    const notInFrame = window.parent !== window
+    if (ext === 'mp3' && notInFrame) {
+      // 设定当前要播放的音乐列表
+      localStorage.setItem(
+        NetworkMusicListStorgeKey,
+        JSON.stringify(
+          musicFiles.value.map((file: Record<string, any>) => ({
+            name: file.name,
+            // url: `/proxy/pan/api/v3/share/preview/P4Cq?path=${encodeURIComponent(`/${to}`)}`,
+            url: `//pan.npmdev.com/api/v3/share/preview/P4Cq?path=${encodeURIComponent(`/${to}`)}`,
+          })),
+        ),
+      )
+
+      // 设定当前要播放的音乐文件
+      localStorage.setItem(CurrentMusicFileIdx, musicFiles.value.findIndex((f: Record<string, any>) => f.name === file.name))
+
+      window.parent.postMessage({
+        type: 'applet:mount',
+        payload: 'music',
+      })
+    }
+  }
+  else {
+    router.push(`/explorer/${to}`)
+  }
+}
 </script>
 
 <template>
@@ -68,15 +110,15 @@ function icon(filename: string) {
       'explorer-entry-list-detail': listStyle === 'detail',
     }"
   >
-    <NuxtLink
+    <div
       v-for="file in files" :key="file.id" class="explorer-entry"
-      :to="file.type === 'file' ? `/explorer/preview/${paths.join('/')}/${file.name}` : `/explorer/${paths.join('/')}/${file.name}`"
+      @click="onFileClick(file)"
     >
-      <img :src="icon(file.name)" alt="">
+      <img :src="icon(file)" alt="">
       <div class="explorer-entry-space-detail">
         <div>{{ file.name }}</div>
       </div>
-    </NuxtLink>
+    </div>
   </div>
   <div v-show="!files || files.length === 0" w-full h-full flex-center>
     <img :src="emptyIllustration" alt="" w-80 h-80>

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { MusicFile } from '~~/utils/music'
-
 const groupActive = ref<'main' | 'upload'>('main')
 const showPlayList = ref(false)
-const playList = shallowRef<MusicFile[]>([])
+
+const musicStore = useMusicStore()
+const { playList } = storeToRefs(musicStore)
 const canvasContainer = ref()
 
-const { playing, currentFile, playOrPause, toggleStyle, nextMusic, prevMusic, startPlayFile } = useMusicVisualizer({ fftSize: 64, canvasContainer, playList })
+const { playing, currentFile, playOrPause, toggleStyle, nextMusic, prevMusic, startPlayFile } = useMusicVisualizer({ fftSize: 64, canvasContainer })
 
 function onFileChange(fl: FileList) {
   const fileNames = playList.value
@@ -17,26 +17,12 @@ function onFileChange(fl: FileList) {
     const file = Object.values(fl)[i]
 
     if (!fileNames.includes(file.name)) {
-    // 新文件
+      // 新文件
       const musicFile = new LocalMusicFile(file)
-      playList.value = [...playList.value, musicFile]
+      musicStore.addMusic(musicFile)
     }
   }
 }
-
-onMounted(() => {
-  // https://api.oick.cn/wyy/api.php?id=785902
-  playList.value = [
-    new NetworkMusicFile(
-      '雲流れ - みかん箱,Foxtail-Grass Studio',
-      'https://npmdev.oss-cn-hangzhou.aliyuncs.com/%E9%9B%B2%E6%B5%81%E3%82%8C%20-%20%E3%81%BF%E3%81%8B%E3%82%93%E7%AE%B1%2CFoxtail-Grass%20Studio.mp3',
-    ),
-    new NetworkMusicFile(
-      '初心-潘辰',
-      'https://npmdev.oss-cn-hangzhou.aliyuncs.com/%E5%88%9D%E5%BF%83-%E6%BD%98%E8%BE%B0.128.mp3',
-    ),
-  ]
-})
 </script>
 
 <template>

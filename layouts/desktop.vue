@@ -4,6 +4,7 @@ import loadingIllustration from '@/assets/illustrations/loading.svg?inline'
 import Preference from '~~/utils/preference'
 
 const appletStore = useAppletStore()
+const musicStore = useMusicStore()
 const { mountedApps } = storeToRefs(appletStore)
 
 const apps = computed(() => {
@@ -62,6 +63,21 @@ function loadBackground() {
   img.src = bg
 }
 
+function listenFrame(data: MessageEvent) {
+  const { type, payload } = data.data
+
+  switch (type) {
+    case 'applet:mount':{
+      appletStore.mountApp(payload)
+      break
+    }
+    case 'applet:unmount':{
+      appletStore.unmountApp(payload)
+      break
+    }
+  }
+}
+
 function onRightClick(e: MouseEvent) {
   e.preventDefault()
   contextMenuPosition.value = {
@@ -76,6 +92,8 @@ function onDesktopClick() {
 }
 
 onMounted(() => {
+  window.addEventListener('message', listenFrame)
+
   loadBackground()
 
   const HasShownComputerKey = 'has-shown-computer'
@@ -85,6 +103,10 @@ onMounted(() => {
     // 一小时内不再显示
     Preference.set(HasShownComputerKey, true, 60 * 60)
   }
+})
+
+onUnmounted(() => {
+  window.removeEventListener('message', listenFrame)
 })
 </script>
 
