@@ -29,11 +29,11 @@ function convertPrefix(prefix: string) {
 }
 
 async function listFiles(prefix: string) {
-  console.log('listFiles', prefix)
+  const ossPrefix = convertPrefix(prefix)
   const result = await client.listV2({
-    prefix: convertPrefix(prefix),
+    prefix: ossPrefix,
     delimiter: '/',
-  })
+  }, {})
 
   const { objects, prefixes } = result
 
@@ -42,7 +42,7 @@ async function listFiles(prefix: string) {
     type: 'dir',
   })) ?? []
 
-  const files = objects?.map((object: any) => ({
+  const files = objects?.filter((object: any) => object.name !== ossPrefix).map((object: any) => ({
     name: object.name.split('/').pop(),
     type: 'file',
     url: client.signatureUrl(object.name),
@@ -65,7 +65,6 @@ router.get('/list/**', defineEventHandler(async (event) => {
 }))
 
 router.get('/*', defineEventHandler(async () => {
-  console.log('hello')
   return 'hello'
 }))
 

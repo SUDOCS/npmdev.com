@@ -63,7 +63,7 @@ definePageMeta({
       }
 
       .explorer-entry-space-detail{
-        @apply flex-1 flex-center pb-2 px-2;
+        @apply flex-1 flex-center pb-2 px-2 break-all;
       }
     }
 }
@@ -75,7 +75,7 @@ definePageMeta({
 }
 
 .explorer-entry-list-detail{
-  @apply fcol w-full gap-1 px-1 py-2;
+  @apply fcol w-full gap-1 p-xl;
 
   .explorer-entry{
     @apply w-full frow px-1 rounded-1;

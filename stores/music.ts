@@ -28,15 +28,16 @@ export const useMusicStore = defineStore('music', () => {
     localMusicList.value = [...localMusicList.value, music]
   }
 
-  onUnmounted(() => {
-    localStorage.removeItem(NetworkMusicListStorgeKey)
-    localStorage.removeItem(CurrentMusicFileIdx)
-  })
+  function reset() {
+    localMusicList.value = []
+    currentFileIdx.value = 0
+  }
 
   return {
     playList,
     currentFile,
     currentFileIdx,
     addMusic,
+    reset,
   }
 })

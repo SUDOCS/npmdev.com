@@ -5,16 +5,13 @@ const router = useRouter()
 const explorerStore = useExplorerStore()
 const { listStyle } = storeToRefs(explorerStore)
 
-const navHeader = ref()
-const { height } = useElementSize(navHeader)
-
 const paths = computed(() => {
   return route.params.paths as string[]
 })
 </script>
 
 <template>
-  <div ref="navHeader" fixed w-full border="~ divider b-solid" overflow-hidden>
+  <div w-full border="~ divider b-solid" overflow-hidden>
     <!--  -->
     <div w-full frow px-xs gap-xs my-1>
       <div w-8 h-8 flex-center hover="bg-#ddd" rounded="1/2" @click="router.go(-1)">
@@ -68,8 +65,6 @@ const paths = computed(() => {
       </div>
     </div>
   </div>
-  <!-- 占位置 -->
-  <div w-full :style="{ height: `${height}px` }" />
 
   <div w-full>
     <slot />
