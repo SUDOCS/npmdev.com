@@ -7,17 +7,28 @@ import imageSvg from '@/assets/icons/mimetypes/image.svg?inline'
 import txtSvg from '@/assets/icons/mimetypes/text-plain.svg?inline'
 import unknownSvg from '@/assets/icons/mimetypes/unknown.svg?inline'
 
-const route = useRoute()
+import emptyIllustration from '@/assets/illustrations/empty.svg?inline'
 
-const path = computed(() => {
-  return `/proxy/pan/api/v3/share/list/P4Cq/${(route.params.slug as string[]).join('/')}`
+definePageMeta({
+  layout: 'explorer',
+  title: '文件资源管理器',
 })
 
-const { data } = await useFetch(path)
+const route = useRoute()
+
+const explorerStore = useExplorerStore()
+const { listStyle } = storeToRefs(explorerStore)
+
+const path = computed(() => {
+  return `/proxy/pan/api/v3/share/list/P4Cq/${(route.params.dirs as string[]).join('/')}`
+})
+
+const { data: dirData } = await useFetch(path)
 
 const files = computed(() => {
-  const { code, data: { objects } } = data.value as any
+  const { code, data } = dirData.value as any
   if (code === 0) {
+    const { objects } = data ?? {}
     return objects
   }
 })
@@ -48,14 +59,21 @@ function icon(filename: string) {
 </script>
 
 <template>
-  <ExplorerNavigation />
-  <div class="explorer-entry-list">
+  <div
+    :class="{
+      'explorer-entry-list-block': listStyle === 'block',
+      'explorer-entry-list-detail': listStyle === 'detail',
+    }"
+  >
     <NuxtLink v-for="file in files" :key="file.id" class="explorer-entry" to="/explorer/desktop">
       <img :src="icon(file.name)" alt="">
       <div class="explorer-entry-space-detail">
         <div>{{ file.name }}</div>
       </div>
     </NuxtLink>
+  </div>
+  <div v-show="!files || files.length === 0" w-full h-full flex-center>
+    <img :src="emptyIllustration" alt="" w-80 h-80>
   </div>
 </template>
 

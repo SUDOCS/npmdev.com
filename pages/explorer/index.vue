@@ -4,12 +4,14 @@ import documentFolderSvg from '@/assets/icons/places/folder-documents.svg?inline
 import musicFolderSvg from '@/assets/icons/places/folder-music.svg?inline'
 import picturesFolderSvg from '@/assets/icons/places/folder-pictures.svg?inline'
 import videoFolderSvg from '@/assets/icons/places/folder-videos.svg?inline'
+
+definePageMeta({
+  title: '文件资源管理器',
+})
 </script>
 
 <template>
-  <ExplorerNavigation />
-
-  <div class="explorer-entry-list">
+  <div class="explorer-entry-list-block">
     <NuxtLink class="explorer-entry" to="/explorer/desktop">
       <img :src="desktopFolderSvg" alt="">
       <div class="explorer-entry-space-detail">
@@ -48,34 +50,43 @@ import videoFolderSvg from '@/assets/icons/places/folder-videos.svg?inline'
 </template>
 
 <style lang="scss">
-.explorer-entry-list{
+.explorer-entry-list-block{
     @apply gap-4 p-xl grid
-    grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8
-    2xl:grid-cols-10;
+    grid-cols-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-9
+    2xl:grid-cols-12;
+
+    .explorer-entry{
+      @apply fcol border border-divider border-solid rounded-xl;
+
+      img{
+          @apply w-24 h-24 md:w-32 md:h-32;
+      }
+
+      .explorer-entry-space-detail{
+        @apply flex-1 flex-center pb-2 px-2;
+      }
+    }
 }
+
 .explorer-entry{
-    @apply rounded-xl p-xl
-    fcol text-sm cursor-pointer border border-solid border-divider
-    hover:bg-black/5 transition-colors duration-300;
+    @apply text-sm cursor-pointer border-none
+    hover:bg-black/5;
+    transition: background-color .2s ease-in-out;
+}
+
+.explorer-entry-list-detail{
+  @apply fcol w-full gap-1 px-1 py-2;
+
+  .explorer-entry{
+    @apply w-full frow px-1 rounded-1;
 
     img{
-        @apply w-32 h-32;
+        @apply w-10 h-10;
     }
 
-    &-space-detail{
-        @apply flex-1 flex-center;
+    .explorer-entry-space-detail{
+        @apply flex-1 text-left pl-2;
     }
-
-    &-space-bar{
-        @apply w-full h-2 my-1 bg-divider;
-
-        &::-webkit-progress-bar{
-            @apply bg-divider;
-        }
-
-        &::-webkit-progress-value{
-            @apply bg-primary;
-        }
-    }
+  }
 }
 </style>
