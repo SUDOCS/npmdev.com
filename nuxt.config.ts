@@ -85,14 +85,19 @@ export default defineNuxtConfig({
         },
         async load(id) {
           if (id === buildInfoModuleId) {
-            let commitHash
+            let commitHash = 'unknown'
             if (process.env.VERCEL || process.env.CI) {
               // 在 Vercel 或 CI 中运行
               commitHash = (process.env.VERCEL_GIT_COMMIT_SHA || process.env.GITHUB_SHA)?.slice(0, 7) as string
             }
             else {
-              // 在本地运行
-              commitHash = (await execa('git rev-parse --short HEAD')).stdout
+              try {
+                // 在本地运行
+                commitHash = (await execa('git rev-parse --short HEAD')).stdout
+              }
+              catch (e) {
+                // 遇到错误，忽略
+              }
             }
             const buildInfo: BuildInfo = {
               name,
