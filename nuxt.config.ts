@@ -33,6 +33,14 @@ export default defineNuxtConfig({
     '/proxy/youdao/**': { proxy: 'http://fanyi.youdao.com/**' },
     '/proxy/pan/**': { proxy: 'http://pan.npmdev.com/**', headers: { origin: 'http://pan.npmdev.com' } },
   },
+  runtimeConfig: {
+    oss: {
+      region: 'oss-cn-hangzhou',
+      bucket: 'npmdev-public',
+      accessKeyId: 'yourAccessKeyId', // can be overridden by NUXT_OSS_ACCESS_KEY_ID environment variable
+      accessKeySecret: 'yourAccessKeySecret',
+    },
+  },
   vite: {
     css: {
       preprocessorOptions: {

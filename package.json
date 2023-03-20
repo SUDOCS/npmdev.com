@@ -25,6 +25,7 @@
     "@unocss/transformer-directives": "^0.50.6",
     "@unocss/transformer-variant-group": "^0.50.6",
     "@vueuse/nuxt": "^9.13.0",
+    "ali-oss": "^6.17.1",
     "compressing": "^1.8.0",
     "eslint": "^8.36.0",
     "esno": "^0.16.3",
