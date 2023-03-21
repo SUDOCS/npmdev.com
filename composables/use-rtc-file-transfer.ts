@@ -72,7 +72,9 @@ export function useRTCFileTransfer(options: UseRTCFileTransferOptions) {
     rtcConn = new RTCPeerConnection({
       iceServers: [
         {
-          urls: 'stun:server.npmdev.com',
+          urls: 'turn:server.npmdev.com',
+          username: 'npmdev',
+          credential: 'npmdev.com',
         },
       ],
     })
