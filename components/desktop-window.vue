@@ -7,6 +7,7 @@ const props = defineProps<{
 }>()
 
 const appletStore = useAppletStore()
+const { activeApp } = storeToRefs(appletStore)
 const { unmountApp, clearActiveApp, refreshAppIndex } = appletStore
 const zIndex = ref(refreshAppIndex())
 
@@ -123,7 +124,8 @@ const style = computed(() => {
 })
 
 const stopWatchActiveApp = watchEffect(() => {
-  if (appletStore.activeApp === props.config.name) {
+  if (activeApp.value === props.config.name) {
+    zIndex.value = refreshAppIndex()
     if (state.value === WindowState.Minimized) {
       state.value = oldState.value
     }
@@ -161,7 +163,8 @@ function doWindowAction(action: WindowAction) {
 
 const mouseDown = (e: MouseEvent) => {
   e.preventDefault()
-  zIndex.value = refreshAppIndex()
+  activeApp.value = props.config.name
+
   const { clientX, clientY } = e
 
   const { top: windowTop, left: windowLeft } = (windowEl.value as unknown as HTMLElement).getBoundingClientRect()
@@ -215,6 +218,10 @@ function onIframeLoad() {
 function openNewTab() {
   window.open(props.config.route, '_blank')
 }
+
+function onWindowClick() {
+  activeApp.value = props.config.name
+}
 </script>
 
 <template>
@@ -222,7 +229,7 @@ function openNewTab() {
     ref="windowEl" bg="#fff/70" shadow border border-solid border-gray-200 overflow-hidden
     class="window absolute-full lg:(w-360px h-640px absolute-center) fcol rounded-none lg:rounded-xl"
     :style="{ ...baseStyle, ...style }"
-    @click.stop="zIndex = refreshAppIndex()"
+    @click.stop="onWindowClick"
   >
     <!-- 标题栏底部蒙层 -->
     <div absolute top-0 left-0 right-0 h-42px bg-gradient-to-b from-white:70 to-white:10 blur-1px rounded-t-none lg:rounded-t-xl z-1 />
